@@ -1,0 +1,1 @@
+#Konfiguracni trida pro balikovaci system
