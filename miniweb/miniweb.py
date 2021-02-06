@@ -6,15 +6,18 @@ from .middleware import *
 def start(port=None, params=None):
     return Miniweb.getInstance(port, params)
 
-def filterJ(consumes):
-    print("volam funkci")
-    return True
-
 #trida Controlleru
 class Controller:
     def __init__(self, path, params=None):
         self.path = path
         self.params = params
+
+        #pole referenci na funkce pro middleware
+        self.filters = []
+
+    def addFilter(self, fc):
+        self.filters.append(fc)
+
 
 # Miniweb je kontejner pro cely framework, jedna se o singleton
 class Miniweb:
@@ -45,42 +48,66 @@ class Miniweb:
 
     # Univerzalni route
     def route(self, path, methods, controller=None):
-        methodString = ", ".join(methods)
-        methodString = "["+methodString+"]"
-        if controller != None:
-            print(methodString+" "+controller.path+path)
-        else:
-            print(methodString+" "+path)
         def _route(fc):
-            return fc
+            def wrapper(*args, **kwargs):
+                result = None
+                if validateFilters(controller):
+                    print("Middleware filtry prosli uspesne...")
+                    result = fc(*args, **kwargs)
+                return result
+            return wrapper
         return _route
 
     # Get route
     def get(self, path, controller=None):
         self.route(path, ['GET'], controller)
         def _get(fc):
-            return fc
+            def wrapper(*args, **kwargs):
+                result = None
+                if validateFilters(controller):
+                    print("Middleware filtry prosli uspesne...")
+                    result = fc(*args, **kwargs)
+                return result
+            return wrapper
         return _get
 
     # Post route
     def post(self, path, controller=None):
         self.route(path, ['POST'], controller)
         def _post(fc):
-            return fc
+            def wrapper(*args, **kwargs):
+                result = None
+                if validateFilters(controller):
+                    print("Middleware filtry prosli uspesne...")
+                    result = fc(*args, **kwargs)
+                return result
+            return wrapper
         return _post
 
     # Put route
     def put(self, path, controller=None):
         self.route(path, ['PUT'], controller)
         def _putRoute(fc):
-            return fc
+            def wrapper(*args, **kwargs):
+                result = None
+                if validateFilters(controller):
+                    print("Middleware filtry prosli uspesne...")
+                    result = fc(*args, **kwargs)
+                return result
+            return wrapper
         return _putRoute
 
     # Delete route
     def delete(self, path, controller=None):
         self.route(path, ['DELETE'], controller)
         def _delete(fc):
-            return fc
+            def wrapper(*args, **kwargs):
+                result = None
+                if validateFilters(controller):
+                    print("Middleware filtry prosli uspesne...")
+                    result = fc(*args, **kwargs)
+                return result
+            return wrapper
         return _delete
 
     # Metoda zajistujici definici prijimanych a odesilanych datovych typu
@@ -93,8 +120,8 @@ class Miniweb:
                     result = fc(*args, **kwargs)
                     #middleware kontrola produces, zda se jako HTTP response bude vracet spravny typ
                     if checkProduceType(produces):
-                        print("Response bude odeslana...")
                         #TODO send response
+                        print("Posilam response...")
                 return result
             return wrapper
         return _media

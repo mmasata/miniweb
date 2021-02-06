@@ -5,24 +5,37 @@ import miniweb
 app = miniweb.start(8000)
 userController = miniweb.Controller("/user/")
 
+
+@miniweb.filter()
+def globalFilter():
+    #implementace logiky middleware
+    return True
+
+@miniweb.filter(userController)
+def isLoggedIn():
+    #implementace logiky middleware
+    return True
+
+
+
 @app.media(consumes="JSON", produces="XML")
 @app.route("/alone", ["GET", "DELETE"])
 def noClassFc(req):
-    print("alone")
+    print("ALONE")
     return 0
 
 
 @app.media(consumes="JSON", produces="XML")
 @app.get("foo", userController)
 def foo(req):
-    print("foo")
+    print("FOO")
     return 0
 
 
 @app.media(consumes="JSON", produces="XML")
 @app.post("bar/{id}", userController)
 def bar(req):
-    print("bar")
+    print("BAR")
     return 0
 
 bar(None)
