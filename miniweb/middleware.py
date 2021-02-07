@@ -16,23 +16,28 @@ def filter(controller=None):
     return _filter
 
 # spusti vsechny middleware funkce a vrati boolean
-def validateFilters(controller):
+def validateFilters(controller, req, res):
+    print("Kontrola global filtru...")
+    for filter in globalFilters:
+        if not filter(req, res):
+            return False
     if controller != None:
+        print("Kontrola controller filtru...")
         for filter in controller.filters:
-            if not filter():
+            if not filter(req, res):
                 return False
-    # do filters for all routes
-    # TODO
     return True
 
 
 # kontroluje zda prijaty datovy typ odpovida nastavenemu
-def checkConsumeType(consumes):
+def checkConsumeType(consumes, req):
+    print("Kontrola consume type...")
     # TODO
     return True
 
 
 # kontroluje zda odesilany datovy typ odpovida nastavenemu
-def checkProduceType(produces):
+def checkProduceType(produces, res):
+    print("Kontrola produce type...")
     # TODO
     return True

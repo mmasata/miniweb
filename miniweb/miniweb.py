@@ -1,23 +1,11 @@
 from functools import wraps
-#from urlfunc import *
+from .urlfunc import compile
 from .middleware import *
+from .server import server
 
 # Trida Miniweb je singleton, proto vracime pres tuto metodu
-def start(port=None, params=None):
-    return Miniweb.getInstance(port, params)
-
-#trida Controlleru
-class Controller:
-    def __init__(self, path, params=None):
-        self.path = path
-        self.params = params
-
-        #pole referenci na funkce pro middleware
-        self.filters = []
-
-    def addFilter(self, fc):
-        self.filters.append(fc)
-
+def miniweb():
+    return Miniweb.getInstance()
 
 # Miniweb je kontejner pro cely framework, jedna se o singleton
 class Miniweb:
@@ -25,33 +13,43 @@ class Miniweb:
 
     # staticka metoda zajistujici singleton
     @staticmethod
-    def getInstance(port=None, params=None):
+    def getInstance():
         if Miniweb.__instance == None:
-            Miniweb(port, params)
+            Miniweb()
         return Miniweb.__instance
 
-    def __init__(self, port, params=None):
+    def __init__(self):
         if Miniweb.__instance != None:
             raise Exception("Cannot create new instance of Miniweb class. Its Singleton.")
         else:
+            print("Inicializuji miniweb...")
             Miniweb.__instance = self
-            # port bezici aplikace
-            self.port = port
-
-            # dalsi env parametry
-            self.params = params
-
             # pole, kde bude cela struktura routovani a reference na jednotlive metody
             self.routes = []
+
+    #metoda spusti server
+    #kdyz v params prijde None, budeme brat z env_file.json
+    def run(self, params=None):
+        self.server = server(params)
+
+    #zaregistruje endpoint do mapy
+    def registerEndpoint(self, path, methods, fc):
+        methodStr = "["+", ".join(methods)+"]"
+        print("Registrace endpointu: "+path+" pro metody: "+methodStr)
+        self.routes.append((compile(path), methods, fc))
+
 
     #### Metody zajistujici dekoratory pro cestu endpointu a metody ####
 
     # Univerzalni route
     def route(self, path, methods, controller=None):
         def _route(fc):
+            fullPath = controller.path+path if controller != None else path
+            self.registerEndpoint(fullPath, methods, fc)
             def wrapper(*args, **kwargs):
                 result = None
-                if validateFilters(controller):
+                #volame middleware, posilame controller a referenci na request a response
+                if validateFilters(controller, args[0], args[1]):
                     print("Middleware filtry prosli uspesne...")
                     result = fc(*args, **kwargs)
                 return result
@@ -60,55 +58,27 @@ class Miniweb:
 
     # Get route
     def get(self, path, controller=None):
-        self.route(path, ['GET'], controller)
-        def _get(fc):
-            def wrapper(*args, **kwargs):
-                result = None
-                if validateFilters(controller):
-                    print("Middleware filtry prosli uspesne...")
-                    result = fc(*args, **kwargs)
-                return result
-            return wrapper
-        return _get
+        def _inner(fc):
+            return self.route(path, ["GET"], controller)(fc)
+        return _inner
 
     # Post route
     def post(self, path, controller=None):
-        self.route(path, ['POST'], controller)
-        def _post(fc):
-            def wrapper(*args, **kwargs):
-                result = None
-                if validateFilters(controller):
-                    print("Middleware filtry prosli uspesne...")
-                    result = fc(*args, **kwargs)
-                return result
-            return wrapper
-        return _post
+        def _inner(fc):
+            return self.route(path, ["POST"], controller)(fc)
+        return _inner
 
     # Put route
     def put(self, path, controller=None):
-        self.route(path, ['PUT'], controller)
-        def _putRoute(fc):
-            def wrapper(*args, **kwargs):
-                result = None
-                if validateFilters(controller):
-                    print("Middleware filtry prosli uspesne...")
-                    result = fc(*args, **kwargs)
-                return result
-            return wrapper
-        return _putRoute
+        def _inner(fc):
+            return self.route(path, ["PUT"], controller)(fc)
+        return _inner
 
     # Delete route
     def delete(self, path, controller=None):
-        self.route(path, ['DELETE'], controller)
-        def _delete(fc):
-            def wrapper(*args, **kwargs):
-                result = None
-                if validateFilters(controller):
-                    print("Middleware filtry prosli uspesne...")
-                    result = fc(*args, **kwargs)
-                return result
-            return wrapper
-        return _delete
+        def _inner(fc):
+            return self.route(path, ["DELETE"], controller)(fc)
+        return _inner
 
     # Metoda zajistujici definici prijimanych a odesilanych datovych typu
     def media(self, consumes, produces):
@@ -116,12 +86,14 @@ class Miniweb:
             def wrapper(*args, **kwargs):
                 result = None
                 # middleware kontrola spravnosti consumes
-                if checkConsumeType(consumes):
+                if checkConsumeType(consumes, args[0]):
+                    print("Consume type prosli uspesne...")
                     result = fc(*args, **kwargs)
                     #middleware kontrola produces, zda se jako HTTP response bude vracet spravny typ
-                    if checkProduceType(produces):
-                        #TODO send response
-                        print("Posilam response...")
+                    if result != None:
+                        if checkProduceType(produces, args[1]):
+                            #TODO send response
+                            print("Posilam response...")
                 return result
             return wrapper
         return _media

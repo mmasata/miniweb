@@ -1,41 +1,40 @@
-import miniweb
+from miniweb import miniweb, Controller, filter
 
-#optional parametry portu a ostatnich parametru
-#pokud budou prazdne, budou dotazeny z env_file.json
-app = miniweb.start(8000)
-userController = miniweb.Controller("/user/")
+app = miniweb()
+userController = Controller("/user/")
 
-
-@miniweb.filter()
-def globalFilter():
+#filter vraci boolean, pokud chce poslat i nejakou response naplni ji a vrati False
+@filter()
+def globalFilter(req, res):
     #implementace logiky middleware
     return True
 
-@miniweb.filter(userController)
-def isLoggedIn():
+@filter(userController)
+def isLoggedIn(req, res):
     #implementace logiky middleware
     return True
-
-
 
 @app.media(consumes="JSON", produces="XML")
 @app.route("/alone", ["GET", "DELETE"])
-def noClassFc(req):
-    print("ALONE")
-    return 0
-
+def noClassFc(req, res):
+    print("TEST ENDPOINT")
 
 @app.media(consumes="JSON", produces="XML")
 @app.get("foo", userController)
-def foo(req):
-    print("FOO")
-    return 0
-
+def foo(req, res):
+    print("TEST ENDPOINT")
 
 @app.media(consumes="JSON", produces="XML")
 @app.post("bar/{id}", userController)
-def bar(req):
-    print("BAR")
-    return 0
+def bar(req, res):
+    print("TEST ENDPOINT")
 
-bar(None)
+
+params = {
+    "port": 8000,
+    "log": "debug"
+}
+app.run(params)
+
+#Test volani endpointu
+bar("REQ", "RES")
