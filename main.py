@@ -1,4 +1,4 @@
-from miniweb import miniweb, Controller, filter
+from miniweb import miniweb, Controller, filter, Method, Mime
 
 app = miniweb()
 userController = Controller("/user/")
@@ -14,20 +14,17 @@ def isLoggedIn(req, res):
     #implementace logiky middleware
     return True
 
-@app.media(consumes="JSON", produces="XML")
-@app.route("/alone", ["GET", "DELETE"])
+@app.route("/alone", [Method.GET, Method.DELETE])
 def noClassFc(req, res):
-    print("TEST ENDPOINT")
+    print("TEST ENDPOINT 1")
 
-@app.media(consumes="JSON", produces="XML")
 @app.get("foo", userController)
 def foo(req, res):
-    print("TEST ENDPOINT")
+    print("TEST ENDPOINT 2")
 
-@app.media(consumes="JSON", produces="XML")
 @app.post("bar/{id}", userController)
 def bar(req, res):
-    print("TEST ENDPOINT")
+    print("TEST ENDPOINT 3")
 
 
 params = {
@@ -36,5 +33,6 @@ params = {
 }
 app.run(params)
 
-#Test volani endpointu
-bar("REQ", "RES")
+
+#test volani endpointu z mapy routes
+app.routes[2][2]("REQ", "RES")

@@ -3,4 +3,4 @@
 #zkompiluje String do regexu
 def compile(url):
     #TODO
-    return 0
+    return url

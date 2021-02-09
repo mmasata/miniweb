@@ -1,7 +1,7 @@
-from functools import wraps
 from .urlfunc import compile
 from .middleware import *
 from .server import server
+from .enumerators import *
 
 # Trida Miniweb je singleton, proto vracime pres tuto metodu
 def miniweb():
@@ -31,6 +31,7 @@ class Miniweb:
     #kdyz v params prijde None, budeme brat z env_file.json
     def run(self, params=None):
         self.server = server(params)
+        return 0
 
     #zaregistruje endpoint do mapy
     def registerEndpoint(self, path, methods, fc):
@@ -44,57 +45,38 @@ class Miniweb:
     # Univerzalni route
     def route(self, path, methods, controller=None):
         def _route(fc):
-            fullPath = controller.path+path if controller != None else path
-            self.registerEndpoint(fullPath, methods, fc)
             def wrapper(*args, **kwargs):
                 result = None
                 #volame middleware, posilame controller a referenci na request a response
                 if validateFilters(controller, args[0], args[1]):
-                    print("Middleware filtry prosli uspesne...")
+                    print("Middleware filtry uspesne prosli...")
                     result = fc(*args, **kwargs)
                 return result
+            fullPath = controller.path+path if controller != None else path
+            self.registerEndpoint(fullPath, methods, wrapper)
             return wrapper
         return _route
 
     # Get route
     def get(self, path, controller=None):
         def _inner(fc):
-            return self.route(path, ["GET"], controller)(fc)
+            return self.route(path, [Method.GET], controller)(fc)
         return _inner
 
     # Post route
     def post(self, path, controller=None):
         def _inner(fc):
-            return self.route(path, ["POST"], controller)(fc)
+            return self.route(path, [Method.POST], controller)(fc)
         return _inner
 
     # Put route
     def put(self, path, controller=None):
         def _inner(fc):
-            return self.route(path, ["PUT"], controller)(fc)
+            return self.route(path, [Method.PUT], controller)(fc)
         return _inner
 
     # Delete route
     def delete(self, path, controller=None):
         def _inner(fc):
-            return self.route(path, ["DELETE"], controller)(fc)
+            return self.route(path, [Method.DELETE], controller)(fc)
         return _inner
-
-    # Metoda zajistujici definici prijimanych a odesilanych datovych typu
-    def media(self, consumes, produces):
-        def _media(fc):
-            def wrapper(*args, **kwargs):
-                result = None
-                # middleware kontrola spravnosti consumes
-                if checkConsumeType(consumes, args[0]):
-                    print("Consume type prosli uspesne...")
-                    result = fc(*args, **kwargs)
-                    #middleware kontrola produces, zda se jako HTTP response bude vracet spravny typ
-                    if result != None:
-                        if checkProduceType(produces, args[1]):
-                            #TODO send response
-                            print("Posilam response...")
-                return result
-            return wrapper
-        return _media
-
