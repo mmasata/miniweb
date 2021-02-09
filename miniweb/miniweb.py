@@ -1,11 +1,14 @@
-from .urlfunc import compile
 from .middleware import *
 from .server import server
 from .enumerators import *
+from .route import Route
+from .http_message import Response
+from .html_template import *
+from .string_operations import *
 
 # Trida Miniweb je singleton, proto vracime pres tuto metodu
 def miniweb():
-    return Miniweb.getInstance()
+    return Miniweb.get_instance()
 
 # Miniweb je kontejner pro cely framework, jedna se o singleton
 class Miniweb:
@@ -13,7 +16,7 @@ class Miniweb:
 
     # staticka metoda zajistujici singleton
     @staticmethod
-    def getInstance():
+    def get_instance():
         if Miniweb.__instance == None:
             Miniweb()
         return Miniweb.__instance
@@ -26,18 +29,35 @@ class Miniweb:
             Miniweb.__instance = self
             # pole, kde bude cela struktura routovani a reference na jednotlive metody
             self.routes = []
+            #reference na jedinou instanci serveru
+            self.server = None
 
     #metoda spusti server
     #kdyz v params prijde None, budeme brat z env_file.json
     def run(self, params=None):
-        self.server = server(params)
-        return 0
+        self.server = server(self, params)
 
     #zaregistruje endpoint do mapy
-    def registerEndpoint(self, path, methods, fc):
-        methodStr = "["+", ".join(methods)+"]"
-        print("Registrace endpointu: "+path+" pro metody: "+methodStr)
-        self.routes.append((compile(path), methods, fc))
+    def register_route(self, path, methods, fc):
+        self.routes.append(Route(path, methods, fc))
+
+
+    #metoda, ktera se stara o navraceni responsu klientovi
+    async def get_response(self, req):
+        route = await self.find_route(req)
+        #pokud nenajde shodu, vracime 404
+        if route == None:
+            return Response().status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path)).build()
+        #TODO
+        return None
+
+    #hleda route dle prijateho requestu
+    async def find_route(self, req):
+        for route in self.routes:
+            #musi odpovidat jak metoda, tak cesta s regexem
+            if req.method in route[1] and match(route[0], req.path):
+                return route
+        return None
 
 
     #### Metody zajistujici dekoratory pro cestu endpointu a metody ####
@@ -48,12 +68,12 @@ class Miniweb:
             def wrapper(*args, **kwargs):
                 result = None
                 #volame middleware, posilame controller a referenci na request a response
-                if validateFilters(controller, args[0], args[1]):
+                if validate(controller, args[0], args[1]):
                     print("Middleware filtry uspesne prosli...")
                     result = fc(*args, **kwargs)
                 return result
             fullPath = controller.path+path if controller != None else path
-            self.registerEndpoint(fullPath, methods, wrapper)
+            self.register_route(fullPath, methods, wrapper)
             return wrapper
         return _route
 

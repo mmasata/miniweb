@@ -9,5 +9,5 @@ class Controller:
         self.filters = []
 
     #ulozi si referenci na filter funkci controlleru
-    def addFilter(self, fc):
+    def add_filter(self, fc):
         self.filters.append(fc)
