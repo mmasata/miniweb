@@ -8,4 +8,4 @@ def compile_regex(url):
 #vraci boolean zda String se shoduje s regexem
 def match(regex, path):
     #TODO
-    return True
+    return regex == path

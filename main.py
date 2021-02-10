@@ -1,4 +1,4 @@
-from miniweb import miniweb, Controller, filter, Method, Mime
+from miniweb import miniweb, Controller, filter, Method, Mime, Status
 
 app = miniweb()
 userController = Controller("/user/")
@@ -16,11 +16,11 @@ def isLoggedIn(req, res):
 
 @app.route("/alone", [Method.GET, Method.DELETE])
 def noClassFc(req, res):
-    print("TEST ENDPOINT 1")
+    res.status(Status.BAD_GATEWAY).build()
 
 @app.get("foo", userController)
 def foo(req, res):
-    print("TEST ENDPOINT 2")
+    res.status(Status.OK).type(Mime.HTML).entity("foo").build()
 
 @app.post("bar/{id}", userController)
 def bar(req, res):
@@ -33,6 +33,3 @@ params = {
 }
 app.run(params)
 
-
-#test volani endpointu z mapy routes
-app.routes[2][2]("REQ", "RES")

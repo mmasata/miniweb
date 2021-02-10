@@ -47,17 +47,20 @@ class Server:
         req = Request()
         #zparsuje raw data do vhodnejsiho formatu
         await req.parse(accept_data)
-        res = await self.miniweb.get_response(req)
+        res = await self.miniweb.handle_response(req)
         #pokud prijde None nezavirame, nechame klienta zavrit na timeout
-        if res != None:
-            #TODO vracime
+        if res != None and res.can_send:
+            print("Odesilam response klientovi...")
+            print("Status: "+str(res.status))
+            print("Content-Type: "+res.type)
+            await writer.awrite("HTTP/1.0 "+str(res.status)+"\r\n")
+            await writer.awrite("Content-Type: "+res.type+"\r\n")
+            if res.entity != None:
+                entity_len = str(len(res.entity))
+                await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
+                #await writer.awrite("\r\n")
+                await writer.awrite(res.entity)
             await writer.aclose()
-
-        #await writer.awrite("HTTP/1.0 200 OK\r\n")
-        #await writer.awrite("Content-Type: text/html\r\n")
-        #await writer.awrite("\r\n")
-        #await writer.awrite("<html><body><h1>Miniweb server works!</h1></body></html>")
-        #await writer.aclose()
 
 
     #Zastavi server

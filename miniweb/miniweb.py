@@ -43,19 +43,25 @@ class Miniweb:
 
 
     #metoda, ktera se stara o navraceni responsu klientovi
-    async def get_response(self, req):
+    async def handle_response(self, req):
         route = await self.find_route(req)
         #pokud nenajde shodu, vracime 404
         if route == None:
-            return Response().status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path)).build()
+            print("Route nenalezena...")
+            return Response().status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
+        print("Nasel jsem hledanou route...")
+        print(route.regex)
         #TODO
-        return None
+        res = Response()
+        route.fc(req, res)
+        return res
 
     #hleda route dle prijateho requestu
     async def find_route(self, req):
+        print("Hledam route...")
         for route in self.routes:
             #musi odpovidat jak metoda, tak cesta s regexem
-            if req.method in route[1] and match(route[0], req.path):
+            if req.method in route.methods and match(route.regex, req.path):
                 return route
         return None
 
