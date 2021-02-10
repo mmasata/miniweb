@@ -7,6 +7,7 @@ userController = Controller("/user/")
 @filter()
 def globalFilter(req, res):
     #implementace logiky middleware
+    #res.status(Status.FORBIDDEN).type(Mime.HTML).entity("Neprosel middleware!").build()
     return True
 
 @filter(userController)

@@ -33,7 +33,7 @@ class Miniweb:
             self.server = None
 
     #metoda spusti server
-    #kdyz v params prijde None, budeme brat z env_file.json
+    #kdyz v params prijde None, budeme brat z config.env
     def run(self, params=None):
         self.server = server(self, params)
 
@@ -47,11 +47,7 @@ class Miniweb:
         route = await self.find_route(req)
         #pokud nenajde shodu, vracime 404
         if route == None:
-            print("Route nenalezena...")
             return Response().status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
-        print("Nasel jsem hledanou route...")
-        print(route.regex)
-        #TODO
         res = Response()
         route.fc(req, res)
         return res

@@ -22,7 +22,7 @@ class Server:
             self.miniweb = miniweb
 
             #default file name
-            self.file_name = "env_file.json"
+            self.file_name = "config.env"
         self.init()
 
     #nastavi cestu k env file
@@ -50,15 +50,11 @@ class Server:
         res = await self.miniweb.handle_response(req)
         #pokud prijde None nezavirame, nechame klienta zavrit na timeout
         if res != None and res.can_send:
-            print("Odesilam response klientovi...")
-            print("Status: "+str(res.status))
-            print("Content-Type: "+res.type)
             await writer.awrite("HTTP/1.0 "+str(res.status)+"\r\n")
             await writer.awrite("Content-Type: "+res.type+"\r\n")
             if res.entity != None:
                 entity_len = str(len(res.entity))
                 await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
-                #await writer.awrite("\r\n")
                 await writer.awrite(res.entity)
             await writer.aclose()
 
