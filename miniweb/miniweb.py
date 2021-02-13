@@ -4,7 +4,6 @@ from .enumerators import *
 from .route import Route
 from .http_message import Response
 from .html_template import *
-from .string_operations import *
 
 # Trida Miniweb je singleton, proto vracime pres tuto metodu
 def miniweb():
@@ -25,7 +24,6 @@ class Miniweb:
         if Miniweb.__instance != None:
             raise Exception("Cannot create new instance of Miniweb class. Its Singleton.")
         else:
-            print("Inicializuji miniweb...")
             Miniweb.__instance = self
             # pole, kde bude cela struktura routovani a reference na jednotlive metody
             self.routes = []
@@ -44,22 +42,27 @@ class Miniweb:
 
     #metoda, ktera se stara o navraceni responsu klientovi
     async def handle_response(self, req):
-        route = await self.find_route(req)
+        route, params = await self.find_route(req)
         #pokud nenajde shodu, vracime 404
         if route == None:
             return Response().status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
         res = Response()
-        route.fc(req, res)
+        #pokud ma parametry predame do dekorovane funkce, v opacnem pripade nikoliv
+        if params != None:
+            route.fc(req, res, params)
+        else:
+            route.fc(req, res)
         return res
 
-    #hleda route dle prijateho requestu
+    #hleda route (a parametry) dle prijateho requestu
     async def find_route(self, req):
-        print("Hledam route...")
         for route in self.routes:
             #musi odpovidat jak metoda, tak cesta s regexem
-            if req.method in route.methods and match(route.regex, req.path):
-                return route
-        return None
+            if req.method in route.methods:
+                match, params = route.match_with_vars(req.path)
+                if match:
+                    return route, params
+        return None, None
 
 
     #### Metody zajistujici dekoratory pro cestu endpointu a metody ####
@@ -71,7 +74,6 @@ class Miniweb:
                 result = None
                 #volame middleware, posilame controller a referenci na request a response
                 if validate(controller, args[0], args[1]):
-                    print("Middleware filtry uspesne prosli...")
                     result = fc(*args, **kwargs)
                 return result
             fullPath = controller.path+path if controller != None else path

@@ -1,7 +1,7 @@
 #trida Controlleru
 class Controller:
     def __init__(self, path, params=None):
-        print("Vytvoreni controlleru "+path)
+        #print("Vytvoreni controlleru "+path)
         self.path = path
         self.params = params
 

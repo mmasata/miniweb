@@ -23,9 +23,15 @@ def noClassFc(req, res):
 def foo(req, res):
     res.status(Status.OK).type(Mime.HTML).entity("foo").build()
 
-@app.post("bar/{id}", userController)
-def bar(req, res):
-    print("TEST ENDPOINT 3")
+@app.post("bar/{user}/user/{id}/", userController)
+def bar(req, res, var):
+    query_params_string = ""
+    path_params_string = ""
+    for key in req.params:
+        query_params_string += "["+key+"]: "+req.params[key]+"<br>"
+    for key in var:
+        path_params_string += "[" + key + "]: " + var[key] + "<br>"
+    res.status(Status.ACCEPTED).type(Mime.HTML).entity("Path variable jede <br> QueryParams: <br>"+query_params_string+"<br> Path params: <br>"+path_params_string).build()
 
 
 params = {

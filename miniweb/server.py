@@ -1,3 +1,4 @@
+import micropython
 import uasyncio as asyncio
 from .http_message import Request
 
@@ -36,13 +37,13 @@ class Server:
 
     #Spusti server
     def init(self):
-        print("Inicializuji server na portu:"+str(self.params["port"]))
         self.event_loop = asyncio.get_event_loop()
         self.event_loop .create_task(asyncio.start_server(self.handle, "localhost", self.params["port"]))
         self.event_loop .run_forever()
 
     #pracuje s inputem a outputem
     async def handle(self, reader, writer):
+        #micropython.mem_info()
         accept_data = await reader.read()
         req = Request()
         #zparsuje raw data do vhodnejsiho formatu
@@ -50,16 +51,15 @@ class Server:
         res = await self.miniweb.handle_response(req)
         #pokud prijde None nezavirame, nechame klienta zavrit na timeout
         if res != None and res.can_send:
-            await writer.awrite("HTTP/1.0 "+str(res.status)+"\r\n")
-            await writer.awrite("Content-Type: "+res.type+"\r\n")
-            if res.entity != None:
-                entity_len = str(len(res.entity))
+            await writer.awrite("HTTP/1.0 "+str(res.stat)+"\r\n")
+            if res.ent != None or res.mime != None:
+                await writer.awrite("Content-Type: "+res.mime+"\r\n")
+                entity_len = str(len(res.ent))
                 await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
-                await writer.awrite(res.entity)
+                await writer.awrite(res.ent)
             await writer.aclose()
 
 
     #Zastavi server
     def stop(self):
-        print("Vypinam server...")
         self.event_loop.close()

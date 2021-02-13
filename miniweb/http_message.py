@@ -1,10 +1,6 @@
 #trida obalujici HTTP request
 class Request:
 
-    def __init__(self):
-        print("Miniweb dostal request...")
-
-
     #prijata data jsou RAW, je treba je roztridit
     async def parse(self, data):
         #data prijdou v bytech, je treba je precodovat
@@ -24,7 +20,6 @@ class Request:
                 continue
             if "Content-Length:" in row_arr[i] and not read_content:
                 content_len = int(row_arr[i].split()[1])
-                print(content_len)
                 read_content = True
                 continue
             if read_content:
@@ -55,21 +50,24 @@ class Response:
 
     def __init__(self):
         self.can_send = False
+        self.stat = None
+        self.mime = None
+        self.ent = None
 
 
     #ulozi do instance status kod responsu
     def status(self, status):
-        self.status = status
+        self.stat = status
         return self
 
     #ulozi do promenne data, ktera bude vracet v response
     def entity(self, data):
-        self.entity = data
+        self.ent = data
         return self
 
     #ulozi do promenne mime type, ktery bude response vracet
     def type(self, mime):
-        self.type = mime
+        self.mime = mime
         return self
 
     #zmeni boolean parametr na True, tim da najevo ze je response hotova k vraceni
