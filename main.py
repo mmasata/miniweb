@@ -23,7 +23,7 @@ def noClassFc(req, res):
 def foo(req, res):
     res.status(Status.OK).type(Mime.HTML).entity("foo").build()
 
-@app.post("bar/{user}/user/{id}/", userController)
+@app.post("name/{name}/surname/{surname}", userController)
 def bar(req, res, var):
     query_params_string = ""
     path_params_string = ""

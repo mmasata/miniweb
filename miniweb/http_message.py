@@ -1,36 +1,27 @@
 #trida obalujici HTTP request
 class Request:
 
-    #prijata data jsou RAW, je treba je roztridit
-    async def parse(self, data):
-        #data prijdou v bytech, je treba je precodovat
-        row_arr = data.decode().split("\r\n")
-        row_arr_len = len(row_arr)
-        read_content = False
-        content_len = content_len_read = 0
-        self.content = ""
-        for i in range(0, row_arr_len):
-            if i == 0:
-                #na zacatku dostaneme metodu, cestu a protokol
-                self.method, full_path, self.protocol = row_arr[i].split()
-                await self.find_query_params(full_path)
-                continue
-            if "Content-Type:" in row_arr[i] and not read_content:
-                self.type = row_arr[i].split()[1]
-                continue
-            if "Content-Length:" in row_arr[i] and not read_content:
-                content_len = int(row_arr[i].split()[1])
-                read_content = True
-                continue
-            if read_content:
-                #kontrolujeme zda jeste muzeme cist
-                content_len_read += len(row_arr[i])
-                if content_len_read <= content_len:
-                    self.content += row_arr[i]
-                    #pokud mame jiz vsechny radky, necteme dale
-                    if content_len == content_len_read:
-                        read_content = False
+    def __init__(self):
+        self.headers = {}
 
+    async def parse_header(self, data, first=False):
+        if first:
+            # na zacatku dostaneme metodu, cestu a protokol
+            self.method, full_path, self.protocol = data.split()
+            await self.find_query_params(full_path)
+        else:
+            header, value = data.split(": ")
+            self.headers[header] = value
+            if "Content-Type" == header:
+                self.type = value
+            elif "Content-Length" == header:
+                self.content_len = int(value)
+                self.content_read = True
+                return False
+        return True
+
+    async def parse_content(self, data):
+        self.content = data
 
     #z cesty si vytahne query params a ulozi je do dictionary
     async def find_query_params(self, full_path):

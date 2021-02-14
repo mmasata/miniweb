@@ -26,10 +26,6 @@ class Server:
             self.file_name = "config.env"
         self.init()
 
-    #nastavi cestu k env file
-    def set_config_file_name(self, name):
-        self.file_name = name
-
     # Vezme si env parametry ze souboru
     def get_params_from_config_file(self):
         #TODO
@@ -38,16 +34,26 @@ class Server:
     #Spusti server
     def init(self):
         self.event_loop = asyncio.get_event_loop()
-        self.event_loop .create_task(asyncio.start_server(self.handle, "localhost", self.params["port"]))
-        self.event_loop .run_forever()
+        self.event_loop.create_task(asyncio.start_server(self.handle, "localhost", self.params["port"]))
+        self.event_loop.run_forever()
 
     #pracuje s inputem a outputem
     async def handle(self, reader, writer):
-        #micropython.mem_info()
-        accept_data = await reader.read()
         req = Request()
-        #zparsuje raw data do vhodnejsiho formatu
-        await req.parse(accept_data)
+        first_line = True
+        reading_headers = True
+        #headers budeme cist po radcich, protoze je stejne potrebujeme roztridit
+        while reading_headers:
+            header_line = await reader.readline()
+            # zparsuje raw data do vhodnejsiho formatu
+            header_line = header_line.decode()
+            reading_headers = await req.parse_header(header_line, first_line)
+            first_line = False
+        #cteme content jako celek, neni potreba pracovat s radky
+        if req.content_read:
+            content = await reader.read()
+            content = content.decode()
+            await req.parse_content(content)
         res = await self.miniweb.handle_response(req)
         #pokud prijde None nezavirame, nechame klienta zavrit na timeout
         if res != None and res.can_send:
