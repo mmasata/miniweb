@@ -18,7 +18,7 @@ class Route:
         params = []
         current_param = ""
         param_reading = False
-        regex = ""
+        regex = "^"
         for char in url:
             #kdyz mame zacinajici slozenou zavorku, zaciname cist jmeno parametru
             if char == "{":
@@ -40,6 +40,7 @@ class Route:
             if char == "/":
                 slash += 1
             regex += char
+        regex += "$"
         self.regex_str = regex
         return ure.compile(regex), params
 
