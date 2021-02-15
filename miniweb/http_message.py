@@ -1,16 +1,23 @@
 #trida obalujici HTTP request
 class Request:
 
-    def __init__(self):
+    def __init__(self, log):
         self.headers = {}
+        self.log = log
 
     async def parse_header(self, data, first=False):
         if first:
             # na zacatku dostaneme metodu, cestu a protokol
-            self.method, full_path, self.protocol = data.split()
+            self.method, full_path, proto = data.split()
+            self.log.info("Incoming request "+self.method+" "+full_path)
+            #protokol nas nezajima, uvolnime
+            del proto
+
             await self.find_query_params(full_path)
         else:
             header, value = data.split(": ")
+            value = value.replace("\r\n", "")
+            self.log.debug("Header "+header+": "+value)
             self.headers[header] = value
             if "Content-Type" == header:
                 self.type = value
@@ -39,7 +46,8 @@ class Request:
 #trida obalujici HTTP response
 class Response:
 
-    def __init__(self):
+    def __init__(self, log):
+        self.log = log
         self.can_send = False
         self.stat = None
         self.mime = None
@@ -48,6 +56,7 @@ class Response:
 
     #ulozi do instance status kod responsu
     def status(self, status):
+        self.log.debug("Response status was set to "+str(status))
         self.stat = status
         return self
 
@@ -63,5 +72,6 @@ class Response:
 
     #zmeni boolean parametr na True, tim da najevo ze je response hotova k vraceni
     def build(self):
+        self.log.info("Sending response with status:"+str(self.stat)+" and type:"+self.mime)
         self.can_send = True
         return self

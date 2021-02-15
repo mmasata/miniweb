@@ -1,5 +1,14 @@
 #pro zapisovani hodnot, ktere jsou z omezeneho poctu moznosti pouzijeme Enumy
 
+#Enumy pro logovaci urovne (prevzato z uloggeru, aby se to tam mohlo predat)
+class Log:
+    CRITICAL = 50
+    ERROR = 40
+    WARNING = 30
+    INFO = 20
+    DEBUG = 10
+    NOTSET = 0
+
 #Enum pro metody HTTP requestu
 class Method:
     GET = "GET"

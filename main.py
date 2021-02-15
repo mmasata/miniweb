@@ -1,6 +1,10 @@
-from miniweb import miniweb, Controller, filter, Method, Mime, Status
+from miniweb import miniweb, Controller, filter, Method, Mime, Status, Log
 
-app = miniweb()
+params = {
+    "port": 8000,
+    "log": Log.DEBUG
+}
+app = miniweb(params)
 userController = Controller("/user/")
 
 #filter vraci boolean, pokud chce poslat i nejakou response naplni ji a vrati False
@@ -34,9 +38,5 @@ def bar(req, res, var):
     res.status(Status.ACCEPTED).type(Mime.HTML).entity("Path variable jede <br> QueryParams: <br>"+query_params_string+"<br> Path params: <br>"+path_params_string).build()
 
 
-params = {
-    "port": 8000,
-    "log": "debug"
-}
-app.run(params)
+app.run()
 
