@@ -1,11 +1,11 @@
 import ure
+from miniweb.core.miniweb import log
 
 # Route je trida, kde jsou uchovany informace o metode, referenci na funkci dane route a parametry
 class Route:
 
-    def __init__(self, path, methods, fc, log):
-        self.log = log
-        self.log.info("Register route for methods: ["+', '.join(methods)+"] and path:"+path)
+    def __init__(self, path, methods, fc):
+        log.info("Register route for methods: ["+', '.join(methods)+"] and path:"+path)
         self.regex, self.param_keys = self.compile_regex(path)
         self.methods = methods
         self.fc = fc
@@ -13,6 +13,7 @@ class Route:
     #zkompiluje String do regexu
     #vraci kompilovany regex a pole nazvu path variables
     def compile_regex(self, url):
+        log.debug("Compile url to regex.")
         self.num_slashes = []
         slash = 0
         params = []
@@ -55,6 +56,7 @@ class Route:
 
     # najde z cesty path parametry a priradi je k jejich nazvum - klic:value
     def find_vars(self, path):
+        log.debug("Getting variables from path.")
         params = {}
         split_path = path.split("/")
         #zname pozice indexu splitu, kde jsou path variables

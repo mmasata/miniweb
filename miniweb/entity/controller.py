@@ -1,7 +1,8 @@
+from miniweb.core.miniweb import log
 #trida Controlleru
 class Controller:
     def __init__(self, path, params=None):
-        #print("Vytvoreni controlleru "+path)
+        log.debug("Creating of new controller: "+path)
         self.path = path
         self.params = params
 

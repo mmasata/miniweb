@@ -1,10 +1,15 @@
-from .middleware import *
-from .server import server
-from .enumerators import *
-from .route import Route
-from .http_message import Response
-from .html_template import *
 import logging
+log = logging.getLogger("miniweb")
+
+
+from miniweb.entity.middleware import *
+from miniweb.core.server import server
+from miniweb.utils.enumerators import *
+from miniweb.entity.route import Route
+from miniweb.message.response import Response
+from miniweb.utils.templates import *
+from miniweb.entity.config import config
+
 
 # Trida Miniweb je singleton, proto vracime pres tuto metodu
 def miniweb(params=None):
@@ -24,6 +29,7 @@ class Miniweb:
     def __init__(self, params=None):
         if Miniweb.__instance != None:
             raise Exception("Cannot create new instance of Miniweb class. Its Singleton.")
+            log.error("Attempt to create more than one instances of miniweb.")
         else:
             self.params = params if params != None else self.get_params_from_config_file()
             Miniweb.__instance = self
@@ -32,19 +38,13 @@ class Miniweb:
             #reference na jedinou instanci serveru
             self.server = None
             self.init_logging()
+            config(params)
 
-    #postara se o spusteni loggeru
+    #postara se o nastaveni loggeru
     def init_logging(self):
-        self.log = logging.getLogger("miniweb")
-        self.log.setLevel(self.params["log"])
+        log.setLevel(self.params["log"])
         #predame do miniwebu
-        self.log.info("Inicialize miniweb")
-
-
-    # Vezme si env parametry ze souboru
-    def get_params_from_config_file(self):
-        #TODO
-        return 0
+        log.info("Inicialize miniweb")
 
     #metoda spusti server
     #kdyz v params prijde None, budeme brat z config.env
@@ -53,14 +53,14 @@ class Miniweb:
 
     #zaregistruje endpoint do mapy
     def register_route(self, path, methods, fc):
-        self.routes.append(Route(path, methods, fc, self.log))
+        self.routes.append(Route(path, methods, fc))
 
 
     #metoda, ktera se stara o navraceni responsu klientovi
     async def handle_response(self, req):
         route, params = await self.find_route(req)
         #pokud nenajde shodu, vracime 404
-        res = Response(self.log)
+        res = Response()
         if route == None:
             return res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
         #pokud ma parametry predame do dekorovane funkce, v opacnem pripade nikoliv
@@ -77,10 +77,10 @@ class Miniweb:
             if req.method in route.methods:
                 match, params = route.match_with_vars(req.path)
                 if match:
-                    self.log.info("Match with request and route was found.")
-                    self.log.debug("Request match with regex: "+route.regex_str)
+                    log.info("Match with request and route was found.")
+                    log.debug("Request match with regex: "+route.regex_str)
                     return route, params
-        self.log.info("Route for request was not found.")
+        log.info("Route for request was not found.")
         return None, None
 
 
@@ -88,6 +88,7 @@ class Miniweb:
 
     # Univerzalni route
     def route(self, path, methods, controller=None):
+        log.debug("Route decorator accept function for path: "+path)
         def _route(fc):
             def wrapper(*args, **kwargs):
                 result = None

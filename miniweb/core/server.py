@@ -1,6 +1,6 @@
-import micropython
 import uasyncio as asyncio
-from .http_message import Request
+from miniweb.message.request import Request
+from miniweb.core.miniweb import log
 import gc
 
 def server(miniweb):
@@ -19,12 +19,9 @@ class Server:
     def __init__(self, miniweb):
         if Server.__instance != None:
             raise Exception("Cannot create new instance of Server class. Its Singleton.")
+            log.error("Attempt to create more than one instances of Server.")
         else:
             self.miniweb = miniweb
-            self.params = self.miniweb.params
-            self.log = self.miniweb.log
-            #default file name
-            self.file_name = "config.env"
         self.init()
 
 
@@ -33,13 +30,13 @@ class Server:
         #spusti garbage collector
         gc.collect()
         self.event_loop = asyncio.get_event_loop()
-        self.event_loop.create_task(asyncio.start_server(self.handle, "localhost", self.params["port"]))
-        self.log.info("Server is running on localhost port:"+str(self.params["port"]))
+        self.event_loop.create_task(asyncio.start_server(self.handle, "localhost", self.miniweb.params["port"]))
+        log.info("Server is running on localhost port:"+str(self.miniweb.params["port"]))
         self.event_loop.run_forever()
 
     #pracuje s inputem a outputem
     async def handle(self, reader, writer):
-        req = Request(self.log)
+        req = Request()
         first_line = True
         reading_headers = True
         #headers budeme cist po radcich, protoze je stejne potrebujeme roztridit
@@ -65,11 +62,14 @@ class Server:
                 entity_len = str(len(res.ent))
                 await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
                 await writer.awrite(res.ent)
+            log.debug("Closing communication with client.")
             await writer.aclose()
+        log.info("End communication with client without send him response.")
         # po zpracovani a dokonceni response uvolnujeme
         del res
 
     #Zastavi server
     def stop(self):
+        log.info("Stopping server.")
         self.event_loop.close()
 

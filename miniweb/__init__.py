@@ -1,5 +1,5 @@
 #Init modul pro lepsi spravu importu
-from .miniweb import miniweb
-from .controller import Controller
-from .middleware import filter
-from .enumerators import *
+from miniweb.core.miniweb import miniweb
+from miniweb.entity.middleware import filter
+from miniweb.entity.controller import Controller
+from miniweb.utils.enumerators import *
