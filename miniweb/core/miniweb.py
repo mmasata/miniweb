@@ -31,18 +31,18 @@ class Miniweb:
             raise Exception("Cannot create new instance of Miniweb class. Its Singleton.")
             log.error("Attempt to create more than one instances of miniweb.")
         else:
-            self.params = params if params != None else self.get_params_from_config_file()
+            self.config = config(params)
             Miniweb.__instance = self
             # pole, kde bude cela struktura routovani a reference na jednotlive metody
             self.routes = []
             #reference na jedinou instanci serveru
             self.server = None
             self.init_logging()
-            config(params)
 
     #postara se o nastaveni loggeru
     def init_logging(self):
-        log.setLevel(self.params["log"])
+        print(self.config.log)
+        log.setLevel(self.config.log)
         #predame do miniwebu
         log.info("Inicialize miniweb")
 

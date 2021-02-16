@@ -22,6 +22,7 @@ class Server:
             log.error("Attempt to create more than one instances of Server.")
         else:
             self.miniweb = miniweb
+            self.config = miniweb.config
         self.init()
 
 
@@ -30,8 +31,8 @@ class Server:
         #spusti garbage collector
         gc.collect()
         self.event_loop = asyncio.get_event_loop()
-        self.event_loop.create_task(asyncio.start_server(self.handle, "localhost", self.miniweb.params["port"]))
-        log.info("Server is running on localhost port:"+str(self.miniweb.params["port"]))
+        self.event_loop.create_task(asyncio.start_server(self.handle, self.config.host, self.config.port))
+        log.info("Server is running on "+self.config.host+" port:"+str(self.config.port))
         self.event_loop.run_forever()
 
     #pracuje s inputem a outputem

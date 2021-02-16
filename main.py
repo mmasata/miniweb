@@ -2,9 +2,11 @@ from miniweb import miniweb, Controller, filter, Method, Mime, Status, Log
 
 params = {
     "port": 8000,
-    "log": Log.DEBUG
+    "log": Log.DEBUG,
+    "host": "127.0.0.1"
 }
-app = miniweb(params)
+
+app = miniweb()
 userController = Controller("/user/")
 
 #filter vraci boolean, pokud chce poslat i nejakou response naplni ji a vrati False
