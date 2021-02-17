@@ -2,13 +2,14 @@ import logging
 log = logging.getLogger("miniweb")
 
 
-from miniweb.entity.middleware import *
+from miniweb.entity.middleware import validate
 from miniweb.core.server import server
-from miniweb.utils.enumerators import *
+from miniweb.utils.enumerators import Method, Status, Mime
 from miniweb.entity.route import Route
 from miniweb.message.response import Response
 from miniweb.utils.templates import *
 from miniweb.entity.config import config
+from miniweb.exception.exception import *
 
 
 # Trida Miniweb je singleton, proto vracime pres tuto metodu
@@ -28,8 +29,8 @@ class Miniweb:
 
     def __init__(self, params=None):
         if Miniweb.__instance != None:
-            raise Exception("Cannot create new instance of Miniweb class. Its Singleton.")
             log.error("Attempt to create more than one instances of miniweb.")
+            raise SingletonExpcetion("Cannot create new instance of Miniweb class. Its Singleton.")
         else:
             self.config = config(params)
             Miniweb.__instance = self
@@ -41,14 +42,16 @@ class Miniweb:
 
     #postara se o nastaveni loggeru
     def init_logging(self):
-        print(self.config.log)
-        log.setLevel(self.config.log)
-        #predame do miniwebu
-        log.info("Inicialize miniweb")
+        try:
+            log.setLevel(self.config.log)
+            #predame do miniwebu
+            log.info("Inicialize miniweb")
+        except:
+            raise ConfigParamsException("Miniweb log level is missing!")
 
     #metoda spusti server
-    #kdyz v params prijde None, budeme brat z config.env
     def run(self):
+        log.debug("Miniweb send request to initialize Server.")
         self.server = server(self)
 
     #zaregistruje endpoint do mapy

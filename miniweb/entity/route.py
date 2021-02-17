@@ -1,5 +1,6 @@
 import ure
 from miniweb.core.miniweb import log
+from miniweb.exception.exception import *
 
 # Route je trida, kde jsou uchovany informace o metode, referenci na funkci dane route a parametry
 class Route:
@@ -13,37 +14,40 @@ class Route:
     #zkompiluje String do regexu
     #vraci kompilovany regex a pole nazvu path variables
     def compile_regex(self, url):
-        log.debug("Compile url to regex.")
-        self.num_slashes = []
-        slash = 0
-        params = []
-        current_param = ""
-        param_reading = False
-        regex = "^"
-        for char in url:
-            #kdyz mame zacinajici slozenou zavorku, zaciname cist jmeno parametru
-            if char == "{":
-                self.num_slashes.append(slash)
-                param_reading = True
-                continue
-            #kdyz mame ukoncujici slozenou zavorku, prestavame cist jmeno parametru
-            if char == "}":
-                param_reading = False
-                params.append(current_param)
-                #nahradime v promenne regexu
-                regex += "\w+"
-                current_param = ""
-                continue
-            #pokud cteme parametr, pridavame char do stringu
-            if param_reading:
-                current_param += char
-                continue
-            if char == "/":
-                slash += 1
-            regex += char
-        regex += "$"
-        self.regex_str = regex
-        return ure.compile(regex), params
+        try:
+            log.debug("Compile url to regex.")
+            self.num_slashes = []
+            slash = 0
+            params = []
+            current_param = ""
+            param_reading = False
+            regex = "^"
+            for char in url:
+                #kdyz mame zacinajici slozenou zavorku, zaciname cist jmeno parametru
+                if char == "{":
+                    self.num_slashes.append(slash)
+                    param_reading = True
+                    continue
+                #kdyz mame ukoncujici slozenou zavorku, prestavame cist jmeno parametru
+                if char == "}":
+                    param_reading = False
+                    params.append(current_param)
+                    #nahradime v promenne regexu
+                    regex += "\w+"
+                    current_param = ""
+                    continue
+                #pokud cteme parametr, pridavame char do stringu
+                if param_reading:
+                    current_param += char
+                    continue
+                if char == "/":
+                    slash += 1
+                regex += char
+            regex += "$"
+            self.regex_str = regex
+            return ure.compile(regex), params
+        except:
+            raise CompileRegexException("Error with compiling regex in route class!")
 
     #vrati boolean zda sedi, a pokud jsou nejaky path params, pak doplni jejich hodnoty a take vrati
     def match_with_vars(self, path):

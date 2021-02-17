@@ -1,32 +1,38 @@
 from miniweb.core.miniweb import log
+from miniweb.exception.exception import *
 
 #trida obalujici HTTP request
 class Request:
 
     def __init__(self):
         self.headers = {}
+        self.close = False
 
     async def parse_header(self, data, first=False):
-        if first:
-            # na zacatku dostaneme metodu, cestu a protokol
-            self.method, full_path, proto = data.split()
-            log.info("Incoming request "+self.method+" "+full_path)
-            #protokol nas nezajima, uvolnime
-            del proto
+        try:
+            if first:
+                # na zacatku dostaneme metodu, cestu a protokol
+                self.method, full_path, proto = data.split()
+                log.info("Incoming request "+self.method+" "+full_path)
+                #protokol nas nezajima, uvolnime
+                del proto
 
-            await self.find_query_params(full_path)
-        else:
-            header, value = data.split(": ")
-            value = value.replace("\r\n", "")
-            log.debug("Header "+header+": "+value)
-            self.headers[header] = value
-            if "Content-Type" == header:
-                self.type = value
-            elif "Content-Length" == header:
-                self.content_len = int(value)
-                self.content_read = True
-                return False
-        return True
+                await self.find_query_params(full_path)
+            else:
+                header, value = data.split(": ")
+                value = value.replace("\r\n", "")
+                log.debug("Header "+header+": "+value)
+                self.headers[header] = value
+                if "Content-Type" == header:
+                    self.type = value
+                elif "Content-Length" == header:
+                    self.content_len = int(value)
+                    self.content_read = True
+                    return False
+            return True
+        except HeaderException:
+            self.close = True
+
 
     async def parse_content(self, data):
         self.content = data

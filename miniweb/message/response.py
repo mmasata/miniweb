@@ -24,6 +24,7 @@ class Response:
 
     #ulozi do promenne mime type, ktery bude response vracet
     def type(self, mime):
+        log.debug("Response type was set to "+mime)
         self.mime = mime
         return self
 

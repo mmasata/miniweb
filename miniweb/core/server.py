@@ -1,6 +1,7 @@
 import uasyncio as asyncio
 from miniweb.message.request import Request
 from miniweb.core.miniweb import log
+from miniweb.exception.exception import *
 import gc
 
 def server(miniweb):
@@ -18,8 +19,7 @@ class Server:
 
     def __init__(self, miniweb):
         if Server.__instance != None:
-            raise Exception("Cannot create new instance of Server class. Its Singleton.")
-            log.error("Attempt to create more than one instances of Server.")
+            raise SingletonExpcetion("Cannot create new instance of Server class. Its Singleton.")
         else:
             self.miniweb = miniweb
             self.config = miniweb.config
@@ -31,9 +31,13 @@ class Server:
         #spusti garbage collector
         gc.collect()
         self.event_loop = asyncio.get_event_loop()
-        self.event_loop.create_task(asyncio.start_server(self.handle, self.config.host, self.config.port))
-        log.info("Server is running on "+self.config.host+" port:"+str(self.config.port))
-        self.event_loop.run_forever()
+        try:
+            self.event_loop.create_task(asyncio.start_server(self.handle, self.config.host, self.config.port))
+            log.info("Server is running on "+self.config.host+" port:"+str(self.config.port))
+            self.event_loop.run_forever()
+        except:
+            raise ConfigParamsException("Miniweb important config parameters are missing - host or port!")
+
 
     #pracuje s inputem a outputem
     async def handle(self, reader, writer):
@@ -48,26 +52,32 @@ class Server:
             reading_headers = await req.parse_header(header_line, first_line)
             first_line = False
         #cteme content jako celek, neni potreba pracovat s radky
-        if req.content_read:
-            content = await reader.read()
-            content = content.decode()
-            await req.parse_content(content)
-        res = await self.miniweb.handle_response(req)
-        #request uz nas po zpracovani nezajima, uvolnujeme
-        del req
-        #pokud prijde None nezavirame, nechame klienta zavrit na timeout
-        if res != None and res.can_send:
-            await writer.awrite("HTTP/1.0 "+str(res.stat)+"\r\n")
-            if res.ent != None or res.mime != None:
-                await writer.awrite("Content-Type: "+res.mime+"\r\n")
-                entity_len = str(len(res.ent))
-                await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
-                await writer.awrite(res.ent)
-            log.debug("Closing communication with client.")
+        if not req.close:
+            if req.content_read:
+                content = await reader.read()
+                content = content.decode()
+                await req.parse_content(content)
+            res = await self.miniweb.handle_response(req)
+            #request uz nas po zpracovani nezajima, uvolnujeme
+            del req
+            #pokud prijde None nezavirame, nechame klienta zavrit na timeout
+            if res != None and res.can_send:
+                await writer.awrite("HTTP/1.0 "+str(res.stat)+"\r\n")
+                if res.ent != None or res.mime != None:
+                    await writer.awrite("Content-Type: "+res.mime+"\r\n")
+                    entity_len = str(len(res.ent))
+                    await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
+                    await writer.awrite(res.ent)
+                log.debug("Closing communication with client.")
+                await writer.aclose()
+            else:
+                log.warning("End communication with client without send him response.")
+            # po zpracovani a dokonceni response uvolnujeme
+            del res
+        # v pripade ze dostaneme neco spatne, ukoncujeme predcasne spojeni
+        else:
+            log.warning("Closing connection  - wrong client request!")
             await writer.aclose()
-        log.info("End communication with client without send him response.")
-        # po zpracovani a dokonceni response uvolnujeme
-        del res
 
     #Zastavi server
     def stop(self):
