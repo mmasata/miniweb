@@ -23,7 +23,7 @@ class Server:
         else:
             self.miniweb = miniweb
             self.config = miniweb.config
-        self.init()
+            self.init()
 
 
     #Spusti server
@@ -62,7 +62,7 @@ class Server:
             del req
             #pokud prijde None nezavirame, nechame klienta zavrit na timeout
             if res != None and res.can_send:
-                await writer.awrite("HTTP/1.0 "+str(res.stat)+"\r\n")
+                await writer.awrite("HTTP/1.1 "+str(res.stat)+"\r\n")
                 if res.ent != None or res.mime != None:
                     await writer.awrite("Content-Type: "+res.mime+"\r\n")
                     entity_len = str(len(res.ent))

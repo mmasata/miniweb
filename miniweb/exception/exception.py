@@ -17,3 +17,7 @@ class CompileRegexException(Exception):
 class HeaderException(Exception):
     """Request header exception"""
     pass
+
+class ContentTypeException(Exception):
+    """Request content type exception"""
+    pass

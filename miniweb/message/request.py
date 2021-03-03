@@ -1,5 +1,6 @@
 from miniweb.core.miniweb import log
 from miniweb.exception.exception import *
+from .content import *
 
 #trida obalujici HTTP request
 class Request:
@@ -24,10 +25,10 @@ class Request:
                 log.debug("Header "+header+": "+value)
                 self.headers[header] = value
                 if "Content-Type" == header:
-                    self.type = value
+                    self.type = value.split(";")[0]
                 elif "Content-Length" == header:
                     self.content_len = int(value)
-                    self.content_read = True
+                    self.content_read = True if self.content_len > 0 else False
                     return False
             return True
         except HeaderException:
@@ -35,7 +36,11 @@ class Request:
 
 
     async def parse_content(self, data):
-        self.content = data
+        log.debug("Content data: \r\n"+data)
+        try:
+            self.content = get_content(data, self.type)
+        except ContentTypeException:
+            self.close = True
 
     #z cesty si vytahne query params a ulozi je do dictionary
     async def find_query_params(self, full_path):
