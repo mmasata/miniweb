@@ -8,6 +8,7 @@ class Request:
     def __init__(self):
         self.headers = {}
         self.close = False
+        self.content_read = False
 
     async def parse_header(self, data, first=False):
         try:

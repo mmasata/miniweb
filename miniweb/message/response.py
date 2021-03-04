@@ -6,9 +6,9 @@ class Response:
 
     def __init__(self):
         self.can_send = False
-        self.stat = None
-        self.mime = None
-        self.ent = None
+        self.stat = 500
+        self.mime = ""
+        self.ent = ""
 
 
     #ulozi do instance status kod responsu

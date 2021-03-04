@@ -1,4 +1,7 @@
 from miniweb.core.miniweb import log
+from miniweb.utils.enumerators import *
+from miniweb.utils.templates import *
+from miniweb.message.response import *
 # Modul pro middleware funkce
 
 #pole uchovavajici obecne middleware funkce
@@ -26,6 +29,18 @@ def validate(controller, req, res):
             return False
     log.debug("Middleware function was suceed.")
     return True
+
+def validate_consumes(mime, req, res):
+    log.info("Validate consumes")
+    if (mime is None) or (req.type in mime):
+        log.debug("Consumes middleware was suceed.")
+        return True
+    else:
+        log.debug("Consumes middleware failed!")
+        print(dir(res))
+        res.type(Mime.HTML).entity(consume_error(req.type)).status(Status.BAD_REQUEST).build()
+        return False
+
 
 def check_filters_group(filter_arr, req, res):
     for filter in filter_arr:

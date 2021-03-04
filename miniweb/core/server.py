@@ -48,36 +48,36 @@ class Server:
         while reading_headers:
             header_line = await reader.readline()
             # zparsuje raw data do vhodnejsiho formatu
+            if(header_line == b"\r\n"):
+                log.debug("End of request")
+                req.close = True
+                break
             header_line = header_line.decode()
             reading_headers = await req.parse_header(header_line, first_line)
             first_line = False
         #cteme content jako celek, neni potreba pracovat s radky
-        if not req.close:
-            if req.content_read:
-                content = await reader.read()
-                content = content.decode()
-                await req.parse_content(content)
-            res = await self.miniweb.handle_response(req)
-            #request uz nas po zpracovani nezajima, uvolnujeme
-            del req
-            #pokud prijde None nezavirame, nechame klienta zavrit na timeout
-            if res != None and res.can_send:
-                await writer.awrite("HTTP/1.1 "+str(res.stat)+"\r\n")
-                if res.ent != None or res.mime != None:
-                    await writer.awrite("Content-Type: "+res.mime+"\r\n")
-                    entity_len = str(len(res.ent))
-                    await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
-                    await writer.awrite(res.ent)
-                log.debug("Closing communication with client.")
-                await writer.aclose()
-            else:
-                log.warning("End communication with client without send him response.")
-            # po zpracovani a dokonceni response uvolnujeme
-            del res
-        # v pripade ze dostaneme neco spatne, ukoncujeme predcasne spojeni
-        else:
-            log.warning("Closing connection  - wrong client request!")
+        if req.content_read:
+            content = await reader.read()
+            content = content.decode()
+            await req.parse_content(content)
+        res = await self.miniweb.handle_response(req)
+        #request uz nas po zpracovani nezajima, uvolnujeme
+        del req
+        #pokud prijde None nezavirame, nechame klienta zavrit na timeout
+        log.debug("Response arrived back to server.py")
+        if res != None and res.can_send:
+            await writer.awrite("HTTP/1.1 "+str(res.stat)+"\r\n")
+            if res.ent != "" and res.mime != "":
+                await writer.awrite("Content-Type: "+res.mime+"\r\n")
+                entity_len = str(len(res.ent))
+                await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
+                await writer.awrite(res.ent)
+            log.debug("Closing communication with client.")
             await writer.aclose()
+        else:
+            log.warning("End communication with client without send him response.")
+        # po zpracovani a dokonceni response uvolnujeme
+        del res
 
     #Zastavi server
     def stop(self):

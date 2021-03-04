@@ -2,7 +2,7 @@ import logging
 log = logging.getLogger("miniweb")
 
 
-from miniweb.entity.middleware import validate
+from miniweb.entity.middleware import validate, validate_consumes
 from miniweb.core.server import server
 from miniweb.utils.enumerators import Method, Status, Mime
 from miniweb.entity.route import Route
@@ -90,13 +90,13 @@ class Miniweb:
     #### Metody zajistujici dekoratory pro cestu endpointu a metody ####
 
     # Univerzalni route
-    def route(self, path, methods, controller=None):
+    def route(self, path, methods, controller=None, consumes=None):
         log.debug("Route decorator accept function for path: "+path)
         def _route(fc):
             def wrapper(*args, **kwargs):
                 result = None
                 #volame middleware, posilame controller a referenci na request a response
-                if validate(controller, args[0], args[1]):
+                if (validate_consumes(consumes, args[0], args[1])) and (validate(controller, args[0], args[1])):
                     result = fc(*args, **kwargs)
                 return result
             fullPath = controller.path+path if controller != None else path
@@ -105,25 +105,26 @@ class Miniweb:
         return _route
 
     # Get route
-    def get(self, path, controller=None):
+    def get(self, path, controller=None, consumes=None):
         def _inner(fc):
-            return self.route(path, [Method.GET], controller)(fc)
+            return self.route(path, [Method.GET], controller, consumes)(fc)
         return _inner
 
     # Post route
-    def post(self, path, controller=None):
+    def post(self, path, controller=None, consumes=None):
         def _inner(fc):
-            return self.route(path, [Method.POST], controller)(fc)
+            return self.route(path, [Method.POST], controller, consumes)(fc)
         return _inner
 
     # Put route
-    def put(self, path, controller=None):
+    def put(self, path, controller=None, consumes=None):
         def _inner(fc):
-            return self.route(path, [Method.PUT], controller)(fc)
+            return self.route(path, [Method.PUT], controller, consumes)(fc)
         return _inner
 
     # Delete route
-    def delete(self, path, controller=None):
+    def delete(self, path, controller=None, consumes=None):
         def _inner(fc):
-            return self.route(path, [Method.DELETE], controller)(fc)
+            return self.route(path, [Method.DELETE], controller, consumes)(fc)
         return _inner
+

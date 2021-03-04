@@ -6,9 +6,8 @@ import ujson
 def get_content(data, type):
     result = data
     if type == Mime.JSON:
-        json_obj = Json()
-        result = json_obj.parse_data(data)
-        del json_obj
+        log.info("Parsing JSON.")
+        result = ujson.loads(data)
     elif type == Mime.FormData:
         result = FormData(data)
     else:
@@ -26,14 +25,6 @@ class Content():
     def parse_data(self, data):
         pass
 
-class Json(Content):
-
-    def __init__(self):
-        pass
-
-    def parse_data(self, data):
-        log.info("Parsing JSON.")
-        return ujson.loads(data)
 
 class FormData(Content):
 
@@ -62,6 +53,7 @@ class FormData(Content):
             elif current_key is not None:
                 if current_is_file:
                     current_value = self.create_file(filename, current_value)
+                #ulozime do teto instance do parametru s nazvem ze vstupu
                 setattr(self, current_key, current_value)
                 read_values = False
                 current_key = None
