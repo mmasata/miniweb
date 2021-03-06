@@ -5,7 +5,7 @@ log = logging.getLogger("miniweb")
 from miniweb.entity.middleware import validate, validate_consumes
 from miniweb.core.server import server
 from miniweb.utils.enumerators import Method, Status, Mime
-from miniweb.entity.route import Route
+from miniweb.entity.route import Route, Static_route
 from miniweb.message.response import Response
 from miniweb.utils.templates import *
 from miniweb.entity.config import config
@@ -27,6 +27,7 @@ class Miniweb:
             Miniweb(params)
         return Miniweb.__instance
 
+
     def __init__(self, params=None):
         if Miniweb.__instance != None:
             log.error("Attempt to create more than one instances of miniweb.")
@@ -40,6 +41,7 @@ class Miniweb:
             self.server = None
             self.init_logging()
 
+
     #postara se o nastaveni loggeru
     def init_logging(self):
         try:
@@ -49,10 +51,18 @@ class Miniweb:
         except:
             raise ConfigParamsException("Miniweb log level is missing!")
 
+
     #metoda spusti server
     def run(self):
         log.debug("Miniweb send request to initialize Server.")
         self.server = server(self)
+
+
+    #zapne servirovani statickych souboru
+    def static_router(self, root, path):
+        log.info("Static file server was enabled in root: "+root)
+        self.routes.append(Static_route(root, path))
+
 
     #zaregistruje endpoint do mapy
     def register_route(self, path, methods, fc):

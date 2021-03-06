@@ -1,3 +1,9 @@
+from miniweb.core.miniweb import log
+
+def get_mime_by_suffix(suff):
+    log.debug("Incoming suffix to recognize Mime: "+suff)
+    return suffix_file[suff]
+
 #pro zapisovani hodnot, ktere jsou z omezeneho poctu moznosti pouzijeme Enumy
 
 #Enumy pro logovaci urovne (prevzato z uloggeru, aby se to tam mohlo predat)
@@ -22,8 +28,32 @@ class Mime:
     FormData = "multipart/form-data"
     HTML = "text/html"
     CSS = "text/css"
+    JS = "text/javascript"
+    PLAIN = "text/plain"
+    CSV = "text/csv"
+    MD = "text/markdown"
     JPG = "image/jpeg"
     PNG = "image/png"
+    BMP = "image/bmp"
+    SVG = "image/svg+xml"
+
+
+#Mapa pro suffix souboru a jejich content type
+suffix_file = {
+    "html": Mime.HTML,
+    "htm": Mime.HTML,
+    "css": Mime.CSS,
+    "js": Mime.JS,
+    "txt": Mime.PLAIN,
+    "csv": Mime.CSV,
+    "md": Mime.MD,
+    "jpg": Mime.JPG,
+    "jpeg": Mime.JPG,
+    "png": Mime.PNG,
+    "bmp": Mime.BMP,
+    "svg": Mime.SVG
+}
+
 
 #Enum pro HTTP statusy
 class Status:
