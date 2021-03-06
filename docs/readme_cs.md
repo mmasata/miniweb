@@ -31,9 +31,9 @@ def bar(req, res):
 **Route umí pracovat s path parametry i query parametry**. Více v příkladech.
 - [ukázka path parametrů](../examples/path_param_example.py)
 - [ukázka query parametrů](../examples/query_param_example.py)
-- [ukázka použití controlleru v route](../example/controller_example.py)
-- [ukázka HTTP response](../example/http_response_example.py)
-- [ukázka použití consumes v route](../example/consumes_example.py)
+- [ukázka použití controlleru v route](../examples/controller_example.py)
+- [ukázka HTTP response](../examples/http_response_example.py)
+- [ukázka použití consumes v route](../examples/consumes_example.py)
 
 #### Request
 Z requestu je možné přistoupit k headers, query parametrům, či kontentu z těla requestu. Request umí zpracovávat Json a Form Data do objektu, aby byla lehce použitelná pro vývojáře. Když miniweb příchozí content-type nezná, jsou data přístupná pouze jako String.
