@@ -29,11 +29,11 @@ def bar(req, res):
 ``` 
 
 **Route can work with query parameters and also with path parameters**. More in the examples.
-- [example of path parameters]()
-- [example of query parameters]()
-- [example of using controller inside of route]()
-- [example of defining HTTP response]()
-- [example of using consumes inside of route]()
+- [example of path parameters](../examples/path_param_example.py)
+- [example of query parameters](../examples/query_param_example.py)
+- [example of using controller inside of route](../examples/controller_example.py)
+- [example of defining HTTP response](../examples/http_response_example.py)
+- [example of using consumes inside of route](../examples/consumes_example.py)
 
 #### Request
 From the request it is possible to access headers, query parameters, or content from the body of the request. The request can process Json and Form Data into an object to make it easy for developers to use. If the miniweb does not know the incoming content-type, the data is only accessible as a String.
