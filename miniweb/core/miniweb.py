@@ -39,11 +39,11 @@ class Miniweb:
             self.routes = []
             #reference na jedinou instanci serveru
             self.server = None
-            self.init_logging()
+            self.__init_logging()
 
 
     #postara se o nastaveni loggeru
-    def init_logging(self):
+    def __init_logging(self):
         try:
             log.setLevel(self.config.log)
             #predame do miniwebu
@@ -65,13 +65,13 @@ class Miniweb:
 
 
     #zaregistruje endpoint do mapy
-    def register_route(self, path, methods, fc):
+    def __register_route(self, path, methods, fc):
         self.routes.append(Route(path, methods, fc))
 
 
     #metoda, ktera se stara o navraceni responsu klientovi
     async def handle_response(self, req):
-        route, params = await self.find_route(req)
+        route, params = await self.__find_route(req)
         #pokud nenajde shodu, vracime 404
         res = Response()
         if route == None:
@@ -84,7 +84,7 @@ class Miniweb:
         return res
 
     #hleda route (a parametry) dle prijateho requestu
-    async def find_route(self, req):
+    async def __find_route(self, req):
         for route in self.routes:
             #musi odpovidat jak metoda, tak cesta s regexem
             if req.method in route.methods:
@@ -110,7 +110,7 @@ class Miniweb:
                     result = fc(*args, **kwargs)
                 return result
             fullPath = controller.path+path if controller != None else path
-            self.register_route(fullPath, methods, wrapper)
+            self.__register_route(fullPath, methods, wrapper)
             return wrapper
         return _route
 

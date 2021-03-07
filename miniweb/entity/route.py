@@ -10,13 +10,13 @@ class Route:
 
     def __init__(self, path, methods, fc):
         log.info("Register route for methods: ["+', '.join(methods)+"] and path:"+path)
-        self.regex, self.param_keys = self.compile_regex(path)
+        self.regex, self.param_keys = self.__compile_regex(path)
         self.methods = methods
         self.fc = fc
 
     #zkompiluje String do regexu
     #vraci kompilovany regex a pole nazvu path variables
-    def compile_regex(self, url):
+    def __compile_regex(self, url):
         try:
             log.debug("Compile url to regex.")
             self.num_slashes = []
@@ -24,31 +24,27 @@ class Route:
             params = []
             current_param = ""
             param_reading = False
-            regex = "^"
+            self.regex_str = "^"
             for char in url:
                 #kdyz mame zacinajici slozenou zavorku, zaciname cist jmeno parametru
                 if char == "{":
                     self.num_slashes.append(slash)
                     param_reading = True
-                    continue
                 #kdyz mame ukoncujici slozenou zavorku, prestavame cist jmeno parametru
-                if char == "}":
+                elif char == "}":
                     param_reading = False
                     params.append(current_param)
                     #nahradime v promenne regexu
-                    regex += "\w+"
+                    self.regex_str += "\w+"
                     current_param = ""
-                    continue
                 #pokud cteme parametr, pridavame char do stringu
-                if param_reading:
+                elif param_reading:
                     current_param += char
-                    continue
-                if char == "/":
-                    slash += 1
-                regex += char
-            regex += "$"
-            self.regex_str = regex
-            return ure.compile(regex), params
+                else:
+                    self.regex_str += char
+                    slash = slash+1 if char == "/" else slash
+            self.regex_str += "$"
+            return ure.compile(self.regex_str), params
         except:
             raise CompileRegexException("Error with compiling regex in route class!")
 
@@ -58,11 +54,11 @@ class Route:
         params = None
         if match:
             if len(self.param_keys) > 0:
-                params = self.find_vars(path)
+                params = self.__find_vars(path)
         return match, params
 
     # najde z cesty path parametry a priradi je k jejich nazvum - klic:value
-    def find_vars(self, path):
+    def __find_vars(self, path):
         log.debug("Getting variables from path.")
         params = {}
         split_path = path.split("/")
@@ -95,7 +91,7 @@ class Static_route(Route):
                     res.status(Status.NOT_FOUND).type(Mime.HTML).entity(file_not_found(req.path)).build()
         super().__init__(path, "GET", find_file)
 
-    def compile_regex(self, url):
+    def __compile_regex(self, url):
         try:
             self.regex_str = "^"+self.file_path+"\S+"
             return ure.compile(self.regex_str), []

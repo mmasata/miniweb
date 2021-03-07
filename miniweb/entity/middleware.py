@@ -32,13 +32,12 @@ def validate(controller, req, res):
 
 def validate_consumes(mime, req, res):
     log.info("Validate consumes")
-    if (mime is None) or (req.type in mime):
+    if (mime is None) or (req.headers["Content-Type"] in mime):
         log.debug("Consumes middleware was suceed.")
         return True
     else:
-        log.debug("Consumes middleware failed!")
-        print(dir(res))
-        res.type(Mime.HTML).entity(consume_error(req.type)).status(Status.BAD_REQUEST).build()
+        log.warning("Consumes middleware failed!")
+        res.type(Mime.HTML).entity(consume_error(req.headers["Content-Type"])).status(Status.BAD_REQUEST).build()
         return False
 
 
@@ -46,6 +45,6 @@ def check_filters_group(filter_arr, req, res):
     for filter in filter_arr:
         result = filter(req, res)
         if not result:
-            log.debug("Middleware function failed: "+filter.__name__)
+            log.warning("Middleware function failed: "+filter.__name__)
             return False
     return True

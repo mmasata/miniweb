@@ -23,24 +23,28 @@ class Server:
         else:
             self.miniweb = miniweb
             self.config = miniweb.config
-            self.init()
+            self.__init()
 
 
     #Spusti server
-    def init(self):
+    def __init(self):
         #spusti garbage collector
         gc.collect()
-        self.event_loop = asyncio.get_event_loop()
+        port = None
+        host = None
         try:
-            self.event_loop.create_task(asyncio.start_server(self.handle, self.config.host, self.config.port))
-            log.info("Server is running on "+self.config.host+" port:"+str(self.config.port))
-            self.event_loop.run_forever()
+            port = self.config.port
+            host = self.config.host
         except:
-            raise ConfigParamsException("Miniweb important config parameters are missing - host or port!")
+            raise ConfigParamsException("Host or port is missing!")
+        self.event_loop = asyncio.get_event_loop()
+        self.event_loop.create_task(asyncio.start_server(self.__handle, host, port))
+        log.info("Server is running on "+self.config.host+" port:"+str(port))
+        self.event_loop.run_forever()
 
 
     #pracuje s inputem a outputem
-    async def handle(self, reader, writer):
+    async def __handle(self, reader, writer):
         req = Request()
         first_line = True
         reading_headers = True
@@ -48,21 +52,16 @@ class Server:
         while reading_headers:
             header_line = await reader.readline()
             # zparsuje raw data do vhodnejsiho formatu
-            if(header_line == b"\r\n"):
-                log.debug("End of request")
-                req.close = True
+            if header_line == b"\r\n":
+                log.debug("All headers was accepted.")
                 break
-            header_line = header_line.decode()
-            reading_headers = await req.parse_header(header_line, first_line)
+            reading_headers = await req.parse_header(header_line.decode(), first_line)
             first_line = False
         #cteme content jako celek, neni potreba pracovat s radky
         if req.content_read:
             content = await reader.read()
-            content = content.decode()
-            await req.parse_content(content)
+            await req.parse_content(content.decode())
         res = await self.miniweb.handle_response(req)
-        #request uz nas po zpracovani nezajima, uvolnujeme
-        del req
         #pokud prijde None nezavirame, nechame klienta zavrit na timeout
         log.debug("Response arrived back to server.py")
         if res != None and res.can_send:
@@ -73,9 +72,8 @@ class Server:
             log.debug("Closing communication with client.")
             await writer.aclose()
         else:
-            log.warning("End communication with client without send him response.")
-        # po zpracovani a dokonceni response uvolnujeme
-        del res
+            log.warning("End communication with client - will drop on timeout!")
+
 
     #Zastavi server
     def stop(self):

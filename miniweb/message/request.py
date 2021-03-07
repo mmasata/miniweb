@@ -17,36 +17,32 @@ class Request:
                 self.method, full_path, proto = data.split()
                 log.info("Incoming request "+self.method+" "+full_path)
                 #protokol nas nezajima, uvolnime
-                del proto
-
-                await self.find_query_params(full_path)
+                await self.__find_query_params(full_path)
             else:
                 header, value = data.split(": ")
-                value = value.replace("\r\n", "")
-                log.debug("Header "+header+": "+value)
-                self.headers[header] = value
-                if "Content-Type" == header:
-                    self.type = value.split(";")[0]
-                elif "Content-Length" == header:
+                self.headers[header] = value.replace("\r\n", "")
+                log.debug("Header "+header+": "+self.headers[header])
+                if "Content-Length" == header:
+                    self.headers["Content-Type"] = self.headers["Content-Type"].split(";")[0]
                     self.content_len = int(value)
-                    self.content_read = True if self.content_len > 0 else False
+                    self.content_read = self.content_len > 0
                     return False
             return True
         except HeaderException:
-            self.close = True
+            log.error("Error during read of request headers!")
 
 
     async def parse_content(self, data):
         log.debug("Content data: \r\n"+data)
         try:
-            self.content = get_content(data, self.type)
+            self.content = get_content(data, self.headers["Content-Type"])
         except ContentTypeException:
-            self.close = True
+            log.error("Error in parsing Content-Type!")
 
     #z cesty si vytahne query params a ulozi je do dictionary
-    async def find_query_params(self, full_path):
-        log.debug("Parsing query params.")
+    async def __find_query_params(self, full_path):
         if "?" in full_path:
+            log.debug("Parsing query params.")
             self.path, q_par_str = full_path.split("?", 1)
             q_par_arr = q_par_str.split("&")
             self.params = {}

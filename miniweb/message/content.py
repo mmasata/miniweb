@@ -6,12 +6,12 @@ import ujson
 def get_content(data, type):
     result = data
     if type == Mime.JSON:
-        log.info("Parsing JSON.")
+        log.info("Parsing JSON string to object.")
         result = ujson.loads(data)
     elif type == Mime.FormData:
         result = FormData(data)
     else:
-        log.warning("Unknown content type!")
+        log.warning("Unknown content type! Content will be accessable in raw format.")
     return result
 
 
@@ -19,16 +19,16 @@ def get_content(data, type):
 class Content():
 
     def __init__(self, data):
-        self.parse_data(data)
+        self.__parse_data(data)
 
     #obecna metoda ktera bude prepisovana potomky
-    def parse_data(self, data):
+    def __parse_data(self, data):
         pass
 
 
 class FormData(Content):
 
-    def parse_data(self, data):
+    def __parse_data(self, data):
         log.info("Parsing FormData.")
         rows = data.split("\r\n")
         read_values = False
@@ -41,18 +41,17 @@ class FormData(Content):
             if not (row[0:2] == "--"):
                 #kdyz necteme hodnoty, tak nas nezajimaji prazdne radky
                 if not read_values:
-                    if row == "":
-                        continue
-                    param_header = row.split(";")
-                    current_is_file = len(param_header) == 3
-                    filename = param_header[2] if current_is_file else None
-                    current_key = param_header[1].split('"')[1]
-                    read_values = True
+                    if row != "":
+                        param_header = row.split(";")
+                        current_is_file = len(param_header) == 3
+                        filename = param_header[2] if current_is_file else None
+                        current_key = param_header[1].split('"')[1]
+                        read_values = True
                 else:
                     current_value += row
             elif current_key is not None:
                 if current_is_file:
-                    current_value = self.create_file(filename, current_value)
+                    current_value = self.__create_file(filename, current_value)
                 #ulozime do teto instance do parametru s nazvem ze vstupu
                 setattr(self, current_key, current_value)
                 read_values = False
@@ -60,7 +59,7 @@ class FormData(Content):
                 current_value = ""
                 filename = None
 
-    def create_file(self, filename, data):
+    def __create_file(self, filename, data):
         file_and_type = filename.split(".")
         return File(file_and_type[0], file_and_type[1], data)
 

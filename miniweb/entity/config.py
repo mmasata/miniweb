@@ -24,16 +24,16 @@ class Config:
         else:
             Config.__instance = self
             if params == None:
-                self.get_params_from_config_file()
+                self.__get_params_from_config_file()
             else:
-                self.assign_variables(params)
+                self.__assign_variables(params)
 
     # Vezme si env parametry ze souboru
     # nejdrive musi najit env soubor v projektu
-    def get_params_from_config_file(self):
+    def __get_params_from_config_file(self):
         params = {}
         try:
-            f = open(self.find_file())
+            f = open(self.__find_file())
             data_arr = (f.read()).split("\n")
             for row in data_arr:
                 if "=" in row:
@@ -43,11 +43,11 @@ class Config:
             #nebyl nalezen soubor, nebo z nej nelze cist
             #nelze zalogovat, v tuto chvili neni jeste nadefinovan logger
             raise FileException("No config file was found!")
-        self.assign_variables(params)
+        self.__assign_variables(params)
 
 
     #oskenuje soubory a vrati ten prvni co nalezne s .env priponou
-    def find_file(self):
+    def __find_file(self):
         list = os.ilistdir()
         file_name = None
         for file in list:
@@ -57,6 +57,6 @@ class Config:
         return file_name
 
     #priradi promenne
-    def assign_variables(self, params):
+    def __assign_variables(self, params):
         for key in params:
             setattr(self, key, params[key])

@@ -2,7 +2,7 @@ from miniweb.core.miniweb import log
 #trida Controlleru
 class Controller:
     def __init__(self, path, params=None):
-        log.debug("Creating of new controller: "+path)
+        log.debug("Creating new controller: "+path)
         self.path = path
         self.params = params
 
@@ -11,4 +11,7 @@ class Controller:
 
     #ulozi si referenci na filter funkci controlleru
     def add_filter(self, fc):
-        self.filters.append(fc)
+        if fc is None:
+            log.warning("Filter function is None!")
+        else:
+            self.filters.append(fc)
