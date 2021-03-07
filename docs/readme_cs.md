@@ -7,6 +7,12 @@ Miniweb je jednoduchý web aplikační framework určený pro mikročipy (primá
  - micropip
  - ujson
 
+## Požadavky na zprovoznění
+1. [Stáhnout micropip](https://pypi.org/project/micropython-upip/)
+*Pozn. Následující knihovny stáhnout přes micropip (také upip)*
+2. [Stáhnout asyncio](https://pypi.org/project/micropython-uasyncio/)
+3. [Stáhnout micropython-logging](https://pypi.org/project/micropython-logging/)
+
 ## API
 
 ### Route
@@ -60,6 +66,18 @@ U response je možné nadefinovat status, content-type a samotnou entitu. Vše s
 from miniweb import Status, Mime
     Response().status(Status.OK).type(Mime.HTML).entity("<h1>Ahoj, světe!</h1>").build()
 ``` 
+
+### Statické routery
+Statické routery slouží k spravování servírování statických souborů na serveru. Lze jich nadefinovat více. Přijímají dva povinné parametry - **root**, **path** a jeden nepovinný parametr- **controller**. Parametr **root** definuje, která složka na používaném zařízení je ta výchozí (například "/var/www"). Parametr **path** naopak definuje jakýsi alias, pod kterým bude daná root cesta zadávána v endpointu *(například máme root "/var/www/subfolder/" a path "/file/", tedy když zadáme "/file/index.html", pak se vrací soubor "/var/www/subfolder/index.html")*.
+```python
+from miniweb import miniweb
+    app = miniweb()
+    
+    app.static_router(root="/var/www/", path="/file/")
+``` 
+
+Na Statické routery se jako u běžných route aplikují globální middleware funkce a popřípadě i middleware funkce daného controlleru. Více v příkladu:
+- [ukázka statického routeru](../examples/static_route_example.py)
 
 ### Middleware funkce
 Definuje se skrze dekorátory. Obsahuje jeden nepovinný parametr -  **controller**. Middleware funkce jsou funkce, které jsou vykonávány před samotným vykonáváním route funkce, slouží pro kontrolu a ochranu. Pokud nemají controller, pak jsou volány před všemi routami, u controllerů naopak jen u route, které patří pod controller.
