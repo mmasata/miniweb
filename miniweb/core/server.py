@@ -66,12 +66,10 @@ class Server:
         #pokud prijde None nezavirame, nechame klienta zavrit na timeout
         log.debug("Response arrived back to server.py")
         if res != None and res.can_send:
-            await writer.awrite("HTTP/1.1 "+str(res.stat)+"\r\n")
+            data_to_send = "HTTP/1.1 "+str(res.stat)+"\r\n"
             if res.ent != "" and res.mime != "":
-                await writer.awrite("Content-Type: "+res.mime+"\r\n")
-                entity_len = str(len(res.ent))
-                await writer.awrite("Content-Length: "+entity_len+"\r\n\r\n")
-                await writer.awrite(res.ent)
+                data_to_send += "Content-Type: "+res.mime+"\r\nContent-Length: "+str(len(res.ent))+"\r\n\r\n"+res.ent
+            await writer.awrite(data_to_send)
             log.debug("Closing communication with client.")
             await writer.aclose()
         else:

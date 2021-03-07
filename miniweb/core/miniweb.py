@@ -59,9 +59,9 @@ class Miniweb:
 
 
     #zapne servirovani statickych souboru
-    def static_router(self, root, path):
+    def static_router(self, root, path, controller=None):
         log.info("Static file server was enabled in root: "+root)
-        self.routes.append(Static_route(root, path))
+        self.routes.append(Static_route(root, path, controller))
 
 
     #zaregistruje endpoint do mapy
