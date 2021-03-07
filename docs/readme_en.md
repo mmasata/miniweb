@@ -7,6 +7,13 @@ Miniweb is a simple web application framework designed for microchips (primary E
  - micropip
  - ujson
 
+## Requirements
+1. [Download micropip](https://pypi.org/project/micropython-upip/)
+*Note: Download the following libraries via micropip (also upip)*
+2. [Download asyncio](https://pypi.org/project/micropython-uasyncio/)
+3. [Download micropython-logging](https://pypi.org/project/micropython-logging/)
+
+
 ## API
 
 ### Route
@@ -61,6 +68,17 @@ from miniweb import Status, Mime
     Response().status(Status.OK).type(Mime.HTML).entity("<h1>Ahoj, světe!</h1>").build()
 ``` 
 
+### Static routers
+Static routers are used to manage the serving of static files on the server. More can be defined. They accept two mandatory parameters - **root**, **path** and one optional parameter- **controller**. The **root** parameter defines which folder on the device you are using is the default (for example, "/var/www"). The parameter **path**, on the other hand, defines a kind of alias under which the given root path will be entered in the endpoint *(for example we have root "/var/www/subfolder/" and path "/file/", when we enter "/file/index.html", then the file "/var/www/subfolder/index.html")* is returned.
+```python
+from miniweb import miniweb
+    app = miniweb()
+    
+    app.static_router(root="/var/www/", path="/file/")
+``` 
+
+As with regular routes, global middleware functions and possibly also middleware functions of the given controller are applied to Static routers. More in the example:
+- [example of static router](../examples/static_route_example.py)
 
 ### Middleware function
 It is defined through decorators. It contains one optional parameter - **controller**. Middleware functions are functions that are performed before the actual execution of the route function, used for control and protection. If they do not have a controller, then they are called before all routes, for controllers, on the contrary, only for routes that belong to the controller.
