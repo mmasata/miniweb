@@ -2,6 +2,8 @@
 Miniweb je jednoduchý web aplikační framework určený pro mikročipy (primárně ESP8266 a popřípadě ESP32) s důrazem na výkon. Byl vyvinut jako Bakalářská práce, ale bude i dále rozvíjen.
 
 ## Používané knihovny třetích stran
+**Pozor: Framework běží na verzi micropython 1.13!**
+
  - uasyncio
  - micropython-logging
  - micropip
