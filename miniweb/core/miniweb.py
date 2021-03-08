@@ -11,22 +11,31 @@ from miniweb.utils.templates import *
 from miniweb.entity.config import config
 from miniweb.exception.exception import *
 
-
-# Trida Miniweb je singleton, proto vracime pres tuto metodu
 def miniweb(params=None):
+    '''
+    Return the Miniweb object instance.
+    :param params: Dictionary with configuration parameters. (optional parameter)
+    :return: Miniweb object instance.
+    '''
     return Miniweb.get_instance(params)
 
-# Miniweb je kontejner pro cely framework, jedna se o singleton
+
 class Miniweb:
+    '''
+    Singleton class. It is container for all other framework objects.
+    '''
     __instance = None
 
-    # staticka metoda zajistujici singleton
     @staticmethod
     def get_instance(params=None):
+        '''
+        Static method of Miniweb class. Provides instance and ensure singleton pattern.
+        :param params: Dictionary with configuration parameters. (optional parameter)
+        :return: Miniweb object instance.
+        '''
         if Miniweb.__instance == None:
             Miniweb(params)
         return Miniweb.__instance
-
 
     def __init__(self, params=None):
         if Miniweb.__instance != None:
@@ -35,58 +44,57 @@ class Miniweb:
         else:
             self.config = config(params)
             Miniweb.__instance = self
-            # pole, kde bude cela struktura routovani a reference na jednotlive metody
             self.routes = []
-            #reference na jedinou instanci serveru
             self.server = None
             self.__init_logging()
 
-
-    #postara se o nastaveni loggeru
     def __init_logging(self):
         try:
             log.setLevel(self.config.log)
-            #predame do miniwebu
             log.info("Inicialize miniweb")
         except:
             raise ConfigParamsException("Miniweb log level is missing!")
 
-
-    #metoda spusti server
     def run(self):
+        '''
+        Create Server object instance a run it.
+        :return: None
+        '''
         log.debug("Miniweb send request to initialize Server.")
         self.server = server(self)
 
-
-    #zapne servirovani statickych souboru
     def static_router(self, root, path, controller=None):
+        '''
+        Register static router to miniweb.
+        :param root: Folder path inside of device.
+        :param path: Path for route.
+        :param controller: Group router to group and define path. (optional parameter)
+        :return: None
+        '''
         log.info("Static file server was enabled in root: "+root)
         self.routes.append(Static_route(root, path, controller))
 
-
-    #zaregistruje endpoint do mapy
     def __register_route(self, path, methods, fc):
         self.routes.append(Route(path, methods, fc))
 
-
-    #metoda, ktera se stara o navraceni responsu klientovi
     async def handle_response(self, req):
+        '''
+        From request object find route and call route function. Return response.
+        :param req: HTTP request wrapped inside of Request class.
+        :return: Response object instance.
+        '''
         route, params = await self.__find_route(req)
-        #pokud nenajde shodu, vracime 404
         res = Response()
         if route == None:
             return res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
-        #pokud ma parametry predame do dekorovane funkce, v opacnem pripade nikoliv
         if params != None:
             route.fc(req, res, params)
         else:
             route.fc(req, res)
         return res
 
-    #hleda route (a parametry) dle prijateho requestu
     async def __find_route(self, req):
         for route in self.routes:
-            #musi odpovidat jak metoda, tak cesta s regexem
             if req.method in route.methods:
                 match, params = route.match_with_vars(req.path)
                 if match:
@@ -96,16 +104,20 @@ class Miniweb:
         log.info("Route for request was not found.")
         return None, None
 
-
-    #### Metody zajistujici dekoratory pro cestu endpointu a metody ####
-
-    # Univerzalni route
     def route(self, path, methods, controller=None, consumes=None):
+        '''
+        DECORATOR
+        Register route to miniweb. General class method.
+        :param path: Path for route.
+        :param methods: Route HTTP methods defined in array.
+        :param controller: Group router to group and define path. (optional parameter)
+        :param consumes: Validation for incoming Content-Type. (optional parameter)
+        :return: None
+        '''
         log.debug("Route decorator accept function for path: "+path)
         def _route(fc):
             def wrapper(*args, **kwargs):
                 result = None
-                #volame middleware, posilame controller a referenci na request a response
                 if (validate_consumes(consumes, args[0], args[1])) and (validate(controller, args[0], args[1])):
                     result = fc(*args, **kwargs)
                 return result
@@ -114,26 +126,54 @@ class Miniweb:
             return wrapper
         return _route
 
-    # Get route
     def get(self, path, controller=None, consumes=None):
+        '''
+        DECORATOR
+        Register route to miniweb. Predefined class method with HTTP method - GET.
+        :param path: Path for route.
+        :param controller: Group router to group and define path. (optional parameter)
+        :param consumes: Validation for incoming Content-Type. (optional parameter)
+        :return: None
+        '''
         def _inner(fc):
             return self.route(path, [Method.GET], controller, consumes)(fc)
         return _inner
 
-    # Post route
     def post(self, path, controller=None, consumes=None):
+        '''
+        DECORATOR
+        Register route to miniweb. Predefined class method with HTTP method - POST.
+        :param path: Path for route.
+        :param controller: Group router to group and define path. (optional parameter)
+        :param consumes: Validation for incoming Content-Type. (optional parameter)
+        :return: None
+        '''
         def _inner(fc):
             return self.route(path, [Method.POST], controller, consumes)(fc)
         return _inner
 
-    # Put route
     def put(self, path, controller=None, consumes=None):
+        '''
+        DECORATOR
+        Register route to miniweb. Predefined class method with HTTP method - PUT.
+        :param path: Path for route.
+        :param controller: Group router to group and define path. (optional parameter)
+        :param consumes: Validation for incoming Content-Type. (optional parameter)
+        :return: None
+        '''
         def _inner(fc):
             return self.route(path, [Method.PUT], controller, consumes)(fc)
         return _inner
 
-    # Delete route
     def delete(self, path, controller=None, consumes=None):
+        '''
+        DECORATOR
+        Register route to miniweb. Predefined class method with HTTP method - DELETE.
+        :param path: Path for route.
+        :param controller: Group router to group and define path. (optional parameter)
+        :param consumes: Validation for incoming Content-Type. (optional parameter)
+        :return: None
+        '''
         def _inner(fc):
             return self.route(path, [Method.DELETE], controller, consumes)(fc)
         return _inner

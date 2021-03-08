@@ -5,17 +5,16 @@ from miniweb.utils.enumerators import get_mime_by_suffix, Status, Mime
 from miniweb.utils.templates import *
 from miniweb.entity.middleware import validate
 
-# Route je trida, kde jsou uchovany informace o metode, referenci na funkci dane route a parametry
 class Route:
-
+    '''
+    Route class. Contains path, HTTP methods and reference for route function.
+    '''
     def __init__(self, path, methods, fc):
         log.info("Register route for methods: ["+', '.join(methods)+"] and path:"+path)
         self.regex, self.param_keys = self.__compile_regex(path)
         self.methods = methods
         self.fc = fc
 
-    #zkompiluje String do regexu
-    #vraci kompilovany regex a pole nazvu path variables
     def __compile_regex(self, url):
         try:
             log.debug("Compile url to regex.")
@@ -26,18 +25,14 @@ class Route:
             param_reading = False
             self.regex_str = "^"
             for char in url:
-                #kdyz mame zacinajici slozenou zavorku, zaciname cist jmeno parametru
                 if char == "{":
                     self.num_slashes.append(slash)
                     param_reading = True
-                #kdyz mame ukoncujici slozenou zavorku, prestavame cist jmeno parametru
                 elif char == "}":
                     param_reading = False
                     params.append(current_param)
-                    #nahradime v promenne regexu
                     self.regex_str += "\w+"
                     current_param = ""
-                #pokud cteme parametr, pridavame char do stringu
                 elif param_reading:
                     current_param += char
                 else:
@@ -48,8 +43,13 @@ class Route:
         except:
             raise CompileRegexException("Error with compiling regex in route class!")
 
-    #vrati boolean zda sedi, a pokud jsou nejaky path params, pak doplni jejich hodnoty a take vrati
     def match_with_vars(self, path):
+        '''
+        Accept current path from HTTP request and looking for match with current route.
+        If found try also found path parameters.
+        :param path: Incoming path from HTTP request.
+        :return: Boolean of match; path parameters in dictionary
+        '''
         match = ure.match(self.regex, path) != None
         params = None
         if match:
@@ -57,20 +57,19 @@ class Route:
                 params = self.__find_vars(path)
         return match, params
 
-    # najde z cesty path parametry a priradi je k jejich nazvum - klic:value
     def __find_vars(self, path):
         log.debug("Getting variables from path.")
         params = {}
         split_path = path.split("/")
-        #zname pozice indexu splitu, kde jsou path variables
         slash_arr_size = len(self.num_slashes)
         for i in range(0, slash_arr_size):
             params[self.param_keys[i]] = split_path[self.num_slashes[i]]
         return params
 
-
-#Route pro staticke servirovani
 class Static_route(Route):
+    '''
+    Static route is child of Route class. Define routes for device folder and server static files in device.
+    '''
 
     def __init__(self, root, path, controller=None):
         self.file_path = path if controller is None else controller.path+path
@@ -97,4 +96,3 @@ class Static_route(Route):
             return ure.compile(self.regex_str), []
         except:
             raise CompileRegexException("Error with compiling regex in static route class!")
-

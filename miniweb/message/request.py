@@ -2,8 +2,10 @@ from miniweb.core.miniweb import log
 from miniweb.exception.exception import *
 from .content import *
 
-#trida obalujici HTTP request
 class Request:
+    '''
+    Class for HTTP request which store parameters in class attributes.
+    '''
 
     def __init__(self):
         self.headers = {}
@@ -11,12 +13,16 @@ class Request:
         self.content_read = False
 
     async def parse_header(self, data, first=False):
+        '''
+        Accept HTTP request header in raw and parse them and store to attribute.
+        :param data: Incoming header row.
+        :param first: Boolean if its first incoming row.
+        :return: Boolean if we can continue read headers.
+        '''
         try:
             if first:
-                # na zacatku dostaneme metodu, cestu a protokol
                 self.method, full_path, proto = data.split()
                 log.info("Incoming request "+self.method+" "+full_path)
-                #protokol nas nezajima, uvolnime
                 await self.__find_query_params(full_path)
             else:
                 header, value = data.split(": ")
@@ -33,13 +39,17 @@ class Request:
 
 
     async def parse_content(self, data):
+        '''
+        Accept Content-Data and parse them to object. Object is stored to Request class.
+        :param data: Incoming Content-Data
+        :return: None
+        '''
         log.debug("Content data: \r\n"+data)
         try:
             self.content = get_content(data, self.headers["Content-Type"])
         except ContentTypeException:
             log.error("Error in parsing Content-Type!")
 
-    #z cesty si vytahne query params a ulozi je do dictionary
     async def __find_query_params(self, full_path):
         if "?" in full_path:
             log.debug("Parsing query params.")

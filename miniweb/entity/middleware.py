@@ -2,13 +2,16 @@ from miniweb.core.miniweb import log
 from miniweb.utils.enumerators import *
 from miniweb.utils.templates import *
 from miniweb.message.response import *
-# Modul pro middleware funkce
 
-#pole uchovavajici obecne middleware funkce
 global_filter = []
 
-#dekorator pro registraci middleware filtru
 def filter(controller=None):
+    '''
+    DECORATOR
+    Register middleware function to miniweb container.
+    :param controller: Group router to group and define path. (optional parameter)
+    :return: None
+    '''
     def _filter(fc):
         if controller == None:
             log.debug("Adding new global middleware function.")
@@ -19,8 +22,14 @@ def filter(controller=None):
         return fc
     return _filter
 
-# spusti vsechny middleware funkce a vrati boolean
 def validate(controller, req, res):
+    '''
+    Validate incoming HTTP request - run middleware function.
+    :param controller: Group router to group and define path. (optional parameter)
+    :param req: HTTP request wrapped inside of Request class.
+    :param res: Response class which will define HTTP response.
+    :return: Boolean of success/fail.
+    '''
     log.info("Validate middlewares.")
     if not check_filters_group(global_filter, req, res):
         return False
@@ -31,7 +40,14 @@ def validate(controller, req, res):
     return True
 
 def validate_consumes(mime, req, res):
-    log.info("Validate consumes")
+    '''
+    Validate incoming Content-Type.
+    :param mime: Mime type which route can accept.
+    :param req: HTTP request wrapped inside of Request class.
+    :param res:  Response class which will define HTTP response.
+    :return: Boolean of success/fail.
+    '''
+    log.info("Validate consumes.")
     if (mime is None) or (req.headers["Content-Type"] in mime):
         log.debug("Consumes middleware was suceed.")
         return True
@@ -42,6 +58,13 @@ def validate_consumes(mime, req, res):
 
 
 def check_filters_group(filter_arr, req, res):
+    '''
+    From array with function reference will run this functions.
+    :param filter_arr: Array of filter functions.
+    :param req: HTTP request wrapped inside of Request class.
+    :param res: Response class which will define HTTP response.
+    :return: Boolean of success/fail.
+    '''
     for filter in filter_arr:
         result = filter(req, res)
         if not result:

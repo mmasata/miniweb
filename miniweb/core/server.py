@@ -5,14 +5,26 @@ from miniweb.exception.exception import *
 import gc
 
 def server(miniweb):
+    '''
+    Return the Server object instance.
+    :param params: Reference to instance of Miniweb class.
+    :return: Server object instance.
+    '''
     return Server.get_instance(miniweb)
 
 class Server:
+    '''
+    Singleton class. Run uasyncio and handle HTTP request/response and send it to miniweb.
+    '''
     __instance = None
 
-    # staticka metoda zajistujici singleton
     @staticmethod
     def get_instance(miniweb):
+        '''
+        Static method of Server class. Provides instance and ensure singleton pattern.
+        :param params: Reference to instance of Miniweb class.
+        :return: Server object instance.
+        '''
         if Server.__instance == None:
             Server(miniweb)
         return Server.__instance
@@ -25,10 +37,7 @@ class Server:
             self.config = miniweb.config
             self.__init()
 
-
-    #Spusti server
     def __init(self):
-        #spusti garbage collector
         gc.collect()
         port = None
         host = None
@@ -42,27 +51,21 @@ class Server:
         log.info("Server is running on "+self.config.host+" port:"+str(port))
         self.event_loop.run_forever()
 
-
-    #pracuje s inputem a outputem
     async def __handle(self, reader, writer):
         req = Request()
         first_line = True
         reading_headers = True
-        #headers budeme cist po radcich, protoze je stejne potrebujeme roztridit
         while reading_headers:
             header_line = await reader.readline()
-            # zparsuje raw data do vhodnejsiho formatu
             if header_line == b"\r\n":
                 log.debug("All headers was accepted.")
                 break
             reading_headers = await req.parse_header(header_line.decode(), first_line)
             first_line = False
-        #cteme content jako celek, neni potreba pracovat s radky
         if req.content_read:
             content = await reader.read()
             await req.parse_content(content.decode())
         res = await self.miniweb.handle_response(req)
-        #pokud prijde None nezavirame, nechame klienta zavrit na timeout
         log.debug("Response arrived back to server.py")
         if res != None and res.can_send:
             data_to_send = "HTTP/1.1 "+str(res.stat)+"\r\n"
@@ -74,9 +77,11 @@ class Server:
         else:
             log.warning("End communication with client - will drop on timeout!")
 
-
-    #Zastavi server
     def stop(self):
+        '''
+        Stop uasyncio server.
+        :return: None
+        '''
         log.info("Stopping server.")
         self.event_loop.close()
 

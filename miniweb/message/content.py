@@ -2,8 +2,13 @@ from miniweb.core.miniweb import log
 from miniweb.utils.enumerators import Mime
 import ujson
 
-#metoda najde podle content type prislusneho potomka tridy Content a vytvori jeho instanci a vrati
 def get_content(data, type):
+    '''
+    Parse incoming Content-Type to object.
+    :param data: Raw Content-Data from HTTP request.
+    :param type: Content-Type of HTTP request Content-Data.
+    :return: Data parsed to object.
+    '''
     result = data
     if type == Mime.JSON:
         log.info("Parsing JSON string to object.")
@@ -14,19 +19,21 @@ def get_content(data, type):
         log.warning("Unknown content type! Content will be accessable in raw format.")
     return result
 
-
-#Trida obsahujici objekt contentu z http requestu
 class Content():
+    '''
+    Abstract class for Contents types.
+    '''
 
     def __init__(self, data):
         self.__parse_data(data)
 
-    #obecna metoda ktera bude prepisovana potomky
     def __parse_data(self, data):
         pass
 
-
 class FormData(Content):
+    '''
+    Child of abstract class Content. This class wrapped form data and store them to class attributes.
+    '''
 
     def __parse_data(self, data):
         log.info("Parsing FormData.")
@@ -37,9 +44,7 @@ class FormData(Content):
         filename = None
         current_key = None
         for row in rows:
-            #nezajima nas boundary informace
             if not (row[0:2] == "--"):
-                #kdyz necteme hodnoty, tak nas nezajimaji prazdne radky
                 if not read_values:
                     if row != "":
                         param_header = row.split(";")
@@ -52,7 +57,6 @@ class FormData(Content):
             elif current_key is not None:
                 if current_is_file:
                     current_value = self.__create_file(filename, current_value)
-                #ulozime do teto instance do parametru s nazvem ze vstupu
                 setattr(self, current_key, current_value)
                 read_values = False
                 current_key = None
@@ -65,9 +69,32 @@ class FormData(Content):
 
 
 class File:
+    '''
+    Class for storing file with his data, name, type.
+    '''
 
     def __init__(self, name, type, data):
         self.name = name
         self.type = type
         self.data = data
 
+    def get_data(self):
+        '''
+        Getter for data.
+        :return: File data
+        '''
+        return self.data
+
+    def get_type(self):
+        '''
+        Getter for type.
+        :return: File type
+        '''
+        return self.type
+
+    def get_name(self):
+        '''
+        Getter for name.
+        :return: File name
+        '''
+        return self.name

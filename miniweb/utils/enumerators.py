@@ -1,13 +1,18 @@
 from miniweb.core.miniweb import log
 
 def get_mime_by_suffix(suff):
+    '''
+    Find mime type by incoming file suffix.
+    :param suff: File suffix.
+    :return: mime type
+    '''
     log.debug("Incoming suffix to recognize Mime: "+suff)
     return suffix_file[suff]
 
-#pro zapisovani hodnot, ktere jsou z omezeneho poctu moznosti pouzijeme Enumy
-
-#Enumy pro logovaci urovne (prevzato z uloggeru, aby se to tam mohlo predat)
 class Log:
+    '''
+    Enum class for log levels.
+    '''
     CRITICAL = 50
     ERROR = 40
     WARNING = 30
@@ -15,15 +20,19 @@ class Log:
     DEBUG = 10
     NOTSET = 0
 
-#Enum pro metody HTTP requestu
 class Method:
+    '''
+    Enum class for HTTP Methods.
+    '''
     GET = "GET"
     POST = "POST"
     PUT = "PUT"
     DELETE = "DELETE"
 
-#Enum pro format souboru
 class Mime:
+    '''
+    Enum class for file types.
+    '''
     JSON = "application/json"
     FormData = "multipart/form-data"
     HTML = "text/html"
@@ -38,7 +47,6 @@ class Mime:
     SVG = "image/svg+xml"
 
 
-#Mapa pro suffix souboru a jejich content type
 suffix_file = {
     "html": Mime.HTML,
     "htm": Mime.HTML,
@@ -54,9 +62,10 @@ suffix_file = {
     "svg": Mime.SVG
 }
 
-
-#Enum pro HTTP statusy
 class Status:
+    '''
+    Enum class for HTTP statuses.
+    '''
     CONTINUE = 100
     SWITCHING_PROTOCOL = 101
     PROCESSING = 102

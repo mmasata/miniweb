@@ -1,16 +1,22 @@
 from miniweb.core.miniweb import log
-#trida Controlleru
+
 class Controller:
+    '''
+    Controller class groups routes.
+    Define them prefix in path and define middleware function only for controller routes.
+    '''
     def __init__(self, path, params=None):
         log.debug("Creating new controller: "+path)
         self.path = path
         self.params = params
-
-        #pole referenci na funkce pro middleware
         self.filters = []
 
-    #ulozi si referenci na filter funkci controlleru
     def add_filter(self, fc):
+        '''
+        Save reference to middleware function which belongs to Controller.
+        :param fc: Function reference.
+        :return: None
+        '''
         if fc is None:
             log.warning("Filter function is None!")
         else:
