@@ -8,6 +8,7 @@ Miniweb je jednoduchý web aplikační framework určený pro mikročipy (primá
  - micropython-logging
  - micropip
  - ujson
+ - ure
 
 ## Požadavky na zprovoznění
 1. [Stáhnout micropip](https://pypi.org/project/micropython-upip/)
