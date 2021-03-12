@@ -7,6 +7,7 @@ Miniweb is a simple web application framework designed for microchips (primary E
  - micropython-logging
  - micropip
  - ujson
+ - ure
 
 ## Requirements
 1. [Download micropip](https://pypi.org/project/micropython-upip/)
