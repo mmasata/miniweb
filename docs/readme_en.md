@@ -2,10 +2,12 @@
 Miniweb is a simple web application framework designed for microchips (primary ESP8266 and possibly ESP32) with an emphasis on performance. It was created as a Bachelor's thesis, but will be further developed.
 
 ## Third party used libraries
+**Attention: The framework runs on micropython version 1.13!**
  - uasyncio
  - micropython-logging
  - micropip
  - ujson
+ - ure
 
 ## Requirements
 1. [Download micropip](https://pypi.org/project/micropython-upip/)

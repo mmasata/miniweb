@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>miniweb.utils.enumerators API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>miniweb.utils.enumerators</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from miniweb.core.miniweb import log
+
+def get_mime_by_suffix(suff):
+    &#39;&#39;&#39;
+    Find mime type by incoming file suffix.
+    :param suff: File suffix.
+    :return: mime type
+    &#39;&#39;&#39;
+    log.debug(&#34;Incoming suffix to recognize Mime: &#34;+suff)
+    return suffix_file[suff]
+
+class Log:
+    &#39;&#39;&#39;
+    Enum class for log levels.
+    &#39;&#39;&#39;
+    CRITICAL = 50
+    ERROR = 40
+    WARNING = 30
+    INFO = 20
+    DEBUG = 10
+    NOTSET = 0
+
+class Method:
+    &#39;&#39;&#39;
+    Enum class for HTTP Methods.
+    &#39;&#39;&#39;
+    GET = &#34;GET&#34;
+    POST = &#34;POST&#34;
+    PUT = &#34;PUT&#34;
+    DELETE = &#34;DELETE&#34;
+
+class Mime:
+    &#39;&#39;&#39;
+    Enum class for file types.
+    &#39;&#39;&#39;
+    JSON = &#34;application/json&#34;
+    FormData = &#34;multipart/form-data&#34;
+    HTML = &#34;text/html&#34;
+    CSS = &#34;text/css&#34;
+    JS = &#34;text/javascript&#34;
+    PLAIN = &#34;text/plain&#34;
+    CSV = &#34;text/csv&#34;
+    MD = &#34;text/markdown&#34;
+    JPG = &#34;image/jpeg&#34;
+    PNG = &#34;image/png&#34;
+    BMP = &#34;image/bmp&#34;
+    SVG = &#34;image/svg+xml&#34;
+
+
+suffix_file = {
+    &#34;html&#34;: Mime.HTML,
+    &#34;htm&#34;: Mime.HTML,
+    &#34;css&#34;: Mime.CSS,
+    &#34;js&#34;: Mime.JS,
+    &#34;txt&#34;: Mime.PLAIN,
+    &#34;csv&#34;: Mime.CSV,
+    &#34;md&#34;: Mime.MD,
+    &#34;jpg&#34;: Mime.JPG,
+    &#34;jpeg&#34;: Mime.JPG,
+    &#34;png&#34;: Mime.PNG,
+    &#34;bmp&#34;: Mime.BMP,
+    &#34;svg&#34;: Mime.SVG
+}
+
+class Status:
+    &#39;&#39;&#39;
+    Enum class for HTTP statuses.
+    &#39;&#39;&#39;
+    CONTINUE = 100
+    SWITCHING_PROTOCOL = 101
+    PROCESSING = 102
+    EARLY_HINTS = 103
+    OK = 200
+    CREATED = 201
+    ACCEPTED = 202
+    NON_AUTHORITATIVE_INFORMATION = 203
+    NO_CONTENT = 204
+    RESET_CONTENT = 205
+    PARTIAL_CONTENT = 206
+    MULTI_STATUS = 207
+    ALREADY_REPORTED = 208
+    IM_USED = 226
+    MULTIPLE_CHOICE = 300
+    MOVED_PERMANENTLY = 301
+    FOUND = 302
+    SEE_OTHER = 303
+    NOT_MODIFIED = 304
+    USE_PROXY = 305
+    UNUSED = 306
+    TEMPORARY_REDIRECT = 307
+    PERMANENT_REDIRECT = 308
+    BAD_REQUEST = 400
+    UNAUTHORIZED = 401
+    PAYMENT_REQUIRED = 402
+    FORBIDDEN = 403
+    NOT_FOUND = 404
+    METHOD_NOT_ALLOWED = 405
+    NOT_ACCEPTABLE = 406
+    PROXY_AUTHENTICATION_REQUIRED = 407
+    REQUEST_TIMEOUT = 408
+    CONFLICT = 409
+    GONE = 410
+    LENGTH_REQUIRED = 411
+    PRECONDITION_FAILED = 412
+    PAYLOAD_TOO_LARGE = 413
+    URI_TOO_LONG = 414
+    UNSUPPORTED_MEDIA_TYPE = 415
+    RANGE_NOT_SATISFIABLE = 416
+    EXPECTATION_FAILED = 417
+    IM_A_TEAPOT = 418
+    MISDIRECTED_REQUEST = 421
+    UNPROCESSABLE_ENTITY = 422
+    LOCKED = 423
+    FAILED_DEPENDENCY = 424
+    TOO_EARLY = 425
+    UPGRADE_REQUIRED = 426
+    PRECONDITION_REQUIRED = 428
+    TOO_MANY_REQUESTS = 429
+    REQUEST_HEADER_FIELDS_TOO_LARGE = 431
+    UNAVAILABLE_FOR_LEGAL_REASONS = 451
+    INTERNAL_SERVER_ERROR = 500
+    NOT_IMPLEMENTED = 501
+    BAD_GATEWAY = 502
+    SERVICE_UNAVAILABLE = 503
+    GATEWAY_TIMEOUT = 504
+    HTTP_VERSION_NOT_SUPPORTED = 505
+    VARIANT_ALSO_NEGOTIATES = 506
+    INSUFFICIENT_STORAGE = 507
+    LOOP_DETECTED = 508
+    NOT_EXTENDED = 510
+    NETWORK_AUTHENTICATION_REQUIRED = 511</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="miniweb.utils.enumerators.get_mime_by_suffix"><code class="name flex">
+<span>def <span class="ident">get_mime_by_suffix</span></span>(<span>suff)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Find mime type by incoming file suffix.
+:param suff: File suffix.
+:return: mime type</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_mime_by_suffix(suff):
+    &#39;&#39;&#39;
+    Find mime type by incoming file suffix.
+    :param suff: File suffix.
+    :return: mime type
+    &#39;&#39;&#39;
+    log.debug(&#34;Incoming suffix to recognize Mime: &#34;+suff)
+    return suffix_file[suff]</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="miniweb.utils.enumerators.Log"><code class="flex name class">
+<span>class <span class="ident">Log</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum class for log levels.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Log:
+    &#39;&#39;&#39;
+    Enum class for log levels.
+    &#39;&#39;&#39;
+    CRITICAL = 50
+    ERROR = 40
+    WARNING = 30
+    INFO = 20
+    DEBUG = 10
+    NOTSET = 0</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="miniweb.utils.enumerators.Log.CRITICAL"><code class="name">var <span class="ident">CRITICAL</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Log.DEBUG"><code class="name">var <span class="ident">DEBUG</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Log.ERROR"><code class="name">var <span class="ident">ERROR</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Log.INFO"><code class="name">var <span class="ident">INFO</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Log.NOTSET"><code class="name">var <span class="ident">NOTSET</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Log.WARNING"><code class="name">var <span class="ident">WARNING</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="miniweb.utils.enumerators.Method"><code class="flex name class">
+<span>class <span class="ident">Method</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum class for HTTP Methods.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Method:
+    &#39;&#39;&#39;
+    Enum class for HTTP Methods.
+    &#39;&#39;&#39;
+    GET = &#34;GET&#34;
+    POST = &#34;POST&#34;
+    PUT = &#34;PUT&#34;
+    DELETE = &#34;DELETE&#34;</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="miniweb.utils.enumerators.Method.DELETE"><code class="name">var <span class="ident">DELETE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Method.GET"><code class="name">var <span class="ident">GET</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Method.POST"><code class="name">var <span class="ident">POST</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Method.PUT"><code class="name">var <span class="ident">PUT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime"><code class="flex name class">
+<span>class <span class="ident">Mime</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum class for file types.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Mime:
+    &#39;&#39;&#39;
+    Enum class for file types.
+    &#39;&#39;&#39;
+    JSON = &#34;application/json&#34;
+    FormData = &#34;multipart/form-data&#34;
+    HTML = &#34;text/html&#34;
+    CSS = &#34;text/css&#34;
+    JS = &#34;text/javascript&#34;
+    PLAIN = &#34;text/plain&#34;
+    CSV = &#34;text/csv&#34;
+    MD = &#34;text/markdown&#34;
+    JPG = &#34;image/jpeg&#34;
+    PNG = &#34;image/png&#34;
+    BMP = &#34;image/bmp&#34;
+    SVG = &#34;image/svg+xml&#34;</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="miniweb.utils.enumerators.Mime.BMP"><code class="name">var <span class="ident">BMP</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.CSS"><code class="name">var <span class="ident">CSS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.CSV"><code class="name">var <span class="ident">CSV</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.FormData"><code class="name">var <span class="ident">FormData</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.HTML"><code class="name">var <span class="ident">HTML</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.JPG"><code class="name">var <span class="ident">JPG</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.JS"><code class="name">var <span class="ident">JS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.JSON"><code class="name">var <span class="ident">JSON</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.MD"><code class="name">var <span class="ident">MD</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.PLAIN"><code class="name">var <span class="ident">PLAIN</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.PNG"><code class="name">var <span class="ident">PNG</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Mime.SVG"><code class="name">var <span class="ident">SVG</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="miniweb.utils.enumerators.Status"><code class="flex name class">
+<span>class <span class="ident">Status</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enum class for HTTP statuses.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Status:
+    &#39;&#39;&#39;
+    Enum class for HTTP statuses.
+    &#39;&#39;&#39;
+    CONTINUE = 100
+    SWITCHING_PROTOCOL = 101
+    PROCESSING = 102
+    EARLY_HINTS = 103
+    OK = 200
+    CREATED = 201
+    ACCEPTED = 202
+    NON_AUTHORITATIVE_INFORMATION = 203
+    NO_CONTENT = 204
+    RESET_CONTENT = 205
+    PARTIAL_CONTENT = 206
+    MULTI_STATUS = 207
+    ALREADY_REPORTED = 208
+    IM_USED = 226
+    MULTIPLE_CHOICE = 300
+    MOVED_PERMANENTLY = 301
+    FOUND = 302
+    SEE_OTHER = 303
+    NOT_MODIFIED = 304
+    USE_PROXY = 305
+    UNUSED = 306
+    TEMPORARY_REDIRECT = 307
+    PERMANENT_REDIRECT = 308
+    BAD_REQUEST = 400
+    UNAUTHORIZED = 401
+    PAYMENT_REQUIRED = 402
+    FORBIDDEN = 403
+    NOT_FOUND = 404
+    METHOD_NOT_ALLOWED = 405
+    NOT_ACCEPTABLE = 406
+    PROXY_AUTHENTICATION_REQUIRED = 407
+    REQUEST_TIMEOUT = 408
+    CONFLICT = 409
+    GONE = 410
+    LENGTH_REQUIRED = 411
+    PRECONDITION_FAILED = 412
+    PAYLOAD_TOO_LARGE = 413
+    URI_TOO_LONG = 414
+    UNSUPPORTED_MEDIA_TYPE = 415
+    RANGE_NOT_SATISFIABLE = 416
+    EXPECTATION_FAILED = 417
+    IM_A_TEAPOT = 418
+    MISDIRECTED_REQUEST = 421
+    UNPROCESSABLE_ENTITY = 422
+    LOCKED = 423
+    FAILED_DEPENDENCY = 424
+    TOO_EARLY = 425
+    UPGRADE_REQUIRED = 426
+    PRECONDITION_REQUIRED = 428
+    TOO_MANY_REQUESTS = 429
+    REQUEST_HEADER_FIELDS_TOO_LARGE = 431
+    UNAVAILABLE_FOR_LEGAL_REASONS = 451
+    INTERNAL_SERVER_ERROR = 500
+    NOT_IMPLEMENTED = 501
+    BAD_GATEWAY = 502
+    SERVICE_UNAVAILABLE = 503
+    GATEWAY_TIMEOUT = 504
+    HTTP_VERSION_NOT_SUPPORTED = 505
+    VARIANT_ALSO_NEGOTIATES = 506
+    INSUFFICIENT_STORAGE = 507
+    LOOP_DETECTED = 508
+    NOT_EXTENDED = 510
+    NETWORK_AUTHENTICATION_REQUIRED = 511</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="miniweb.utils.enumerators.Status.ACCEPTED"><code class="name">var <span class="ident">ACCEPTED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.ALREADY_REPORTED"><code class="name">var <span class="ident">ALREADY_REPORTED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.BAD_GATEWAY"><code class="name">var <span class="ident">BAD_GATEWAY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.BAD_REQUEST"><code class="name">var <span class="ident">BAD_REQUEST</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.CONFLICT"><code class="name">var <span class="ident">CONFLICT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.CONTINUE"><code class="name">var <span class="ident">CONTINUE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.CREATED"><code class="name">var <span class="ident">CREATED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.EARLY_HINTS"><code class="name">var <span class="ident">EARLY_HINTS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.EXPECTATION_FAILED"><code class="name">var <span class="ident">EXPECTATION_FAILED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.FAILED_DEPENDENCY"><code class="name">var <span class="ident">FAILED_DEPENDENCY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.FORBIDDEN"><code class="name">var <span class="ident">FORBIDDEN</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.FOUND"><code class="name">var <span class="ident">FOUND</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.GATEWAY_TIMEOUT"><code class="name">var <span class="ident">GATEWAY_TIMEOUT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.GONE"><code class="name">var <span class="ident">GONE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.HTTP_VERSION_NOT_SUPPORTED"><code class="name">var <span class="ident">HTTP_VERSION_NOT_SUPPORTED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.IM_A_TEAPOT"><code class="name">var <span class="ident">IM_A_TEAPOT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.IM_USED"><code class="name">var <span class="ident">IM_USED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.INSUFFICIENT_STORAGE"><code class="name">var <span class="ident">INSUFFICIENT_STORAGE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.INTERNAL_SERVER_ERROR"><code class="name">var <span class="ident">INTERNAL_SERVER_ERROR</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.LENGTH_REQUIRED"><code class="name">var <span class="ident">LENGTH_REQUIRED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.LOCKED"><code class="name">var <span class="ident">LOCKED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.LOOP_DETECTED"><code class="name">var <span class="ident">LOOP_DETECTED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.METHOD_NOT_ALLOWED"><code class="name">var <span class="ident">METHOD_NOT_ALLOWED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.MISDIRECTED_REQUEST"><code class="name">var <span class="ident">MISDIRECTED_REQUEST</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.MOVED_PERMANENTLY"><code class="name">var <span class="ident">MOVED_PERMANENTLY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.MULTIPLE_CHOICE"><code class="name">var <span class="ident">MULTIPLE_CHOICE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.MULTI_STATUS"><code class="name">var <span class="ident">MULTI_STATUS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.NETWORK_AUTHENTICATION_REQUIRED"><code class="name">var <span class="ident">NETWORK_AUTHENTICATION_REQUIRED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.NON_AUTHORITATIVE_INFORMATION"><code class="name">var <span class="ident">NON_AUTHORITATIVE_INFORMATION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.NOT_ACCEPTABLE"><code class="name">var <span class="ident">NOT_ACCEPTABLE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.NOT_EXTENDED"><code class="name">var <span class="ident">NOT_EXTENDED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.NOT_FOUND"><code class="name">var <span class="ident">NOT_FOUND</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.NOT_IMPLEMENTED"><code class="name">var <span class="ident">NOT_IMPLEMENTED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.NOT_MODIFIED"><code class="name">var <span class="ident">NOT_MODIFIED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.NO_CONTENT"><code class="name">var <span class="ident">NO_CONTENT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.OK"><code class="name">var <span class="ident">OK</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.PARTIAL_CONTENT"><code class="name">var <span class="ident">PARTIAL_CONTENT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.PAYLOAD_TOO_LARGE"><code class="name">var <span class="ident">PAYLOAD_TOO_LARGE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.PAYMENT_REQUIRED"><code class="name">var <span class="ident">PAYMENT_REQUIRED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.PERMANENT_REDIRECT"><code class="name">var <span class="ident">PERMANENT_REDIRECT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.PRECONDITION_FAILED"><code class="name">var <span class="ident">PRECONDITION_FAILED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.PRECONDITION_REQUIRED"><code class="name">var <span class="ident">PRECONDITION_REQUIRED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.PROCESSING"><code class="name">var <span class="ident">PROCESSING</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.PROXY_AUTHENTICATION_REQUIRED"><code class="name">var <span class="ident">PROXY_AUTHENTICATION_REQUIRED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.RANGE_NOT_SATISFIABLE"><code class="name">var <span class="ident">RANGE_NOT_SATISFIABLE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.REQUEST_HEADER_FIELDS_TOO_LARGE"><code class="name">var <span class="ident">REQUEST_HEADER_FIELDS_TOO_LARGE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.REQUEST_TIMEOUT"><code class="name">var <span class="ident">REQUEST_TIMEOUT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.RESET_CONTENT"><code class="name">var <span class="ident">RESET_CONTENT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.SEE_OTHER"><code class="name">var <span class="ident">SEE_OTHER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.SERVICE_UNAVAILABLE"><code class="name">var <span class="ident">SERVICE_UNAVAILABLE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.SWITCHING_PROTOCOL"><code class="name">var <span class="ident">SWITCHING_PROTOCOL</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.TEMPORARY_REDIRECT"><code class="name">var <span class="ident">TEMPORARY_REDIRECT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.TOO_EARLY"><code class="name">var <span class="ident">TOO_EARLY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.TOO_MANY_REQUESTS"><code class="name">var <span class="ident">TOO_MANY_REQUESTS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.UNAUTHORIZED"><code class="name">var <span class="ident">UNAUTHORIZED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.UNAVAILABLE_FOR_LEGAL_REASONS"><code class="name">var <span class="ident">UNAVAILABLE_FOR_LEGAL_REASONS</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.UNPROCESSABLE_ENTITY"><code class="name">var <span class="ident">UNPROCESSABLE_ENTITY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.UNSUPPORTED_MEDIA_TYPE"><code class="name">var <span class="ident">UNSUPPORTED_MEDIA_TYPE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.UNUSED"><code class="name">var <span class="ident">UNUSED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.UPGRADE_REQUIRED"><code class="name">var <span class="ident">UPGRADE_REQUIRED</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.URI_TOO_LONG"><code class="name">var <span class="ident">URI_TOO_LONG</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.USE_PROXY"><code class="name">var <span class="ident">USE_PROXY</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="miniweb.utils.enumerators.Status.VARIANT_ALSO_NEGOTIATES"><code class="name">var <span class="ident">VARIANT_ALSO_NEGOTIATES</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="miniweb.utils" href="index.html">miniweb.utils</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="miniweb.utils.enumerators.get_mime_by_suffix" href="#miniweb.utils.enumerators.get_mime_by_suffix">get_mime_by_suffix</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="miniweb.utils.enumerators.Log" href="#miniweb.utils.enumerators.Log">Log</a></code></h4>
+<ul class="two-column">
+<li><code><a title="miniweb.utils.enumerators.Log.CRITICAL" href="#miniweb.utils.enumerators.Log.CRITICAL">CRITICAL</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Log.DEBUG" href="#miniweb.utils.enumerators.Log.DEBUG">DEBUG</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Log.ERROR" href="#miniweb.utils.enumerators.Log.ERROR">ERROR</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Log.INFO" href="#miniweb.utils.enumerators.Log.INFO">INFO</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Log.NOTSET" href="#miniweb.utils.enumerators.Log.NOTSET">NOTSET</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Log.WARNING" href="#miniweb.utils.enumerators.Log.WARNING">WARNING</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="miniweb.utils.enumerators.Method" href="#miniweb.utils.enumerators.Method">Method</a></code></h4>
+<ul class="">
+<li><code><a title="miniweb.utils.enumerators.Method.DELETE" href="#miniweb.utils.enumerators.Method.DELETE">DELETE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Method.GET" href="#miniweb.utils.enumerators.Method.GET">GET</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Method.POST" href="#miniweb.utils.enumerators.Method.POST">POST</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Method.PUT" href="#miniweb.utils.enumerators.Method.PUT">PUT</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="miniweb.utils.enumerators.Mime" href="#miniweb.utils.enumerators.Mime">Mime</a></code></h4>
+<ul class="two-column">
+<li><code><a title="miniweb.utils.enumerators.Mime.BMP" href="#miniweb.utils.enumerators.Mime.BMP">BMP</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.CSS" href="#miniweb.utils.enumerators.Mime.CSS">CSS</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.CSV" href="#miniweb.utils.enumerators.Mime.CSV">CSV</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.FormData" href="#miniweb.utils.enumerators.Mime.FormData">FormData</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.HTML" href="#miniweb.utils.enumerators.Mime.HTML">HTML</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.JPG" href="#miniweb.utils.enumerators.Mime.JPG">JPG</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.JS" href="#miniweb.utils.enumerators.Mime.JS">JS</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.JSON" href="#miniweb.utils.enumerators.Mime.JSON">JSON</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.MD" href="#miniweb.utils.enumerators.Mime.MD">MD</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.PLAIN" href="#miniweb.utils.enumerators.Mime.PLAIN">PLAIN</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.PNG" href="#miniweb.utils.enumerators.Mime.PNG">PNG</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Mime.SVG" href="#miniweb.utils.enumerators.Mime.SVG">SVG</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="miniweb.utils.enumerators.Status" href="#miniweb.utils.enumerators.Status">Status</a></code></h4>
+<ul class="">
+<li><code><a title="miniweb.utils.enumerators.Status.ACCEPTED" href="#miniweb.utils.enumerators.Status.ACCEPTED">ACCEPTED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.ALREADY_REPORTED" href="#miniweb.utils.enumerators.Status.ALREADY_REPORTED">ALREADY_REPORTED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.BAD_GATEWAY" href="#miniweb.utils.enumerators.Status.BAD_GATEWAY">BAD_GATEWAY</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.BAD_REQUEST" href="#miniweb.utils.enumerators.Status.BAD_REQUEST">BAD_REQUEST</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.CONFLICT" href="#miniweb.utils.enumerators.Status.CONFLICT">CONFLICT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.CONTINUE" href="#miniweb.utils.enumerators.Status.CONTINUE">CONTINUE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.CREATED" href="#miniweb.utils.enumerators.Status.CREATED">CREATED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.EARLY_HINTS" href="#miniweb.utils.enumerators.Status.EARLY_HINTS">EARLY_HINTS</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.EXPECTATION_FAILED" href="#miniweb.utils.enumerators.Status.EXPECTATION_FAILED">EXPECTATION_FAILED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.FAILED_DEPENDENCY" href="#miniweb.utils.enumerators.Status.FAILED_DEPENDENCY">FAILED_DEPENDENCY</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.FORBIDDEN" href="#miniweb.utils.enumerators.Status.FORBIDDEN">FORBIDDEN</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.FOUND" href="#miniweb.utils.enumerators.Status.FOUND">FOUND</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.GATEWAY_TIMEOUT" href="#miniweb.utils.enumerators.Status.GATEWAY_TIMEOUT">GATEWAY_TIMEOUT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.GONE" href="#miniweb.utils.enumerators.Status.GONE">GONE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.HTTP_VERSION_NOT_SUPPORTED" href="#miniweb.utils.enumerators.Status.HTTP_VERSION_NOT_SUPPORTED">HTTP_VERSION_NOT_SUPPORTED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.IM_A_TEAPOT" href="#miniweb.utils.enumerators.Status.IM_A_TEAPOT">IM_A_TEAPOT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.IM_USED" href="#miniweb.utils.enumerators.Status.IM_USED">IM_USED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.INSUFFICIENT_STORAGE" href="#miniweb.utils.enumerators.Status.INSUFFICIENT_STORAGE">INSUFFICIENT_STORAGE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.INTERNAL_SERVER_ERROR" href="#miniweb.utils.enumerators.Status.INTERNAL_SERVER_ERROR">INTERNAL_SERVER_ERROR</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.LENGTH_REQUIRED" href="#miniweb.utils.enumerators.Status.LENGTH_REQUIRED">LENGTH_REQUIRED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.LOCKED" href="#miniweb.utils.enumerators.Status.LOCKED">LOCKED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.LOOP_DETECTED" href="#miniweb.utils.enumerators.Status.LOOP_DETECTED">LOOP_DETECTED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.METHOD_NOT_ALLOWED" href="#miniweb.utils.enumerators.Status.METHOD_NOT_ALLOWED">METHOD_NOT_ALLOWED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.MISDIRECTED_REQUEST" href="#miniweb.utils.enumerators.Status.MISDIRECTED_REQUEST">MISDIRECTED_REQUEST</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.MOVED_PERMANENTLY" href="#miniweb.utils.enumerators.Status.MOVED_PERMANENTLY">MOVED_PERMANENTLY</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.MULTIPLE_CHOICE" href="#miniweb.utils.enumerators.Status.MULTIPLE_CHOICE">MULTIPLE_CHOICE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.MULTI_STATUS" href="#miniweb.utils.enumerators.Status.MULTI_STATUS">MULTI_STATUS</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.NETWORK_AUTHENTICATION_REQUIRED" href="#miniweb.utils.enumerators.Status.NETWORK_AUTHENTICATION_REQUIRED">NETWORK_AUTHENTICATION_REQUIRED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.NON_AUTHORITATIVE_INFORMATION" href="#miniweb.utils.enumerators.Status.NON_AUTHORITATIVE_INFORMATION">NON_AUTHORITATIVE_INFORMATION</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.NOT_ACCEPTABLE" href="#miniweb.utils.enumerators.Status.NOT_ACCEPTABLE">NOT_ACCEPTABLE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.NOT_EXTENDED" href="#miniweb.utils.enumerators.Status.NOT_EXTENDED">NOT_EXTENDED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.NOT_FOUND" href="#miniweb.utils.enumerators.Status.NOT_FOUND">NOT_FOUND</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.NOT_IMPLEMENTED" href="#miniweb.utils.enumerators.Status.NOT_IMPLEMENTED">NOT_IMPLEMENTED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.NOT_MODIFIED" href="#miniweb.utils.enumerators.Status.NOT_MODIFIED">NOT_MODIFIED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.NO_CONTENT" href="#miniweb.utils.enumerators.Status.NO_CONTENT">NO_CONTENT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.OK" href="#miniweb.utils.enumerators.Status.OK">OK</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.PARTIAL_CONTENT" href="#miniweb.utils.enumerators.Status.PARTIAL_CONTENT">PARTIAL_CONTENT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.PAYLOAD_TOO_LARGE" href="#miniweb.utils.enumerators.Status.PAYLOAD_TOO_LARGE">PAYLOAD_TOO_LARGE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.PAYMENT_REQUIRED" href="#miniweb.utils.enumerators.Status.PAYMENT_REQUIRED">PAYMENT_REQUIRED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.PERMANENT_REDIRECT" href="#miniweb.utils.enumerators.Status.PERMANENT_REDIRECT">PERMANENT_REDIRECT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.PRECONDITION_FAILED" href="#miniweb.utils.enumerators.Status.PRECONDITION_FAILED">PRECONDITION_FAILED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.PRECONDITION_REQUIRED" href="#miniweb.utils.enumerators.Status.PRECONDITION_REQUIRED">PRECONDITION_REQUIRED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.PROCESSING" href="#miniweb.utils.enumerators.Status.PROCESSING">PROCESSING</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.PROXY_AUTHENTICATION_REQUIRED" href="#miniweb.utils.enumerators.Status.PROXY_AUTHENTICATION_REQUIRED">PROXY_AUTHENTICATION_REQUIRED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.RANGE_NOT_SATISFIABLE" href="#miniweb.utils.enumerators.Status.RANGE_NOT_SATISFIABLE">RANGE_NOT_SATISFIABLE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.REQUEST_HEADER_FIELDS_TOO_LARGE" href="#miniweb.utils.enumerators.Status.REQUEST_HEADER_FIELDS_TOO_LARGE">REQUEST_HEADER_FIELDS_TOO_LARGE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.REQUEST_TIMEOUT" href="#miniweb.utils.enumerators.Status.REQUEST_TIMEOUT">REQUEST_TIMEOUT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.RESET_CONTENT" href="#miniweb.utils.enumerators.Status.RESET_CONTENT">RESET_CONTENT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.SEE_OTHER" href="#miniweb.utils.enumerators.Status.SEE_OTHER">SEE_OTHER</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.SERVICE_UNAVAILABLE" href="#miniweb.utils.enumerators.Status.SERVICE_UNAVAILABLE">SERVICE_UNAVAILABLE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.SWITCHING_PROTOCOL" href="#miniweb.utils.enumerators.Status.SWITCHING_PROTOCOL">SWITCHING_PROTOCOL</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.TEMPORARY_REDIRECT" href="#miniweb.utils.enumerators.Status.TEMPORARY_REDIRECT">TEMPORARY_REDIRECT</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.TOO_EARLY" href="#miniweb.utils.enumerators.Status.TOO_EARLY">TOO_EARLY</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.TOO_MANY_REQUESTS" href="#miniweb.utils.enumerators.Status.TOO_MANY_REQUESTS">TOO_MANY_REQUESTS</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.UNAUTHORIZED" href="#miniweb.utils.enumerators.Status.UNAUTHORIZED">UNAUTHORIZED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.UNAVAILABLE_FOR_LEGAL_REASONS" href="#miniweb.utils.enumerators.Status.UNAVAILABLE_FOR_LEGAL_REASONS">UNAVAILABLE_FOR_LEGAL_REASONS</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.UNPROCESSABLE_ENTITY" href="#miniweb.utils.enumerators.Status.UNPROCESSABLE_ENTITY">UNPROCESSABLE_ENTITY</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.UNSUPPORTED_MEDIA_TYPE" href="#miniweb.utils.enumerators.Status.UNSUPPORTED_MEDIA_TYPE">UNSUPPORTED_MEDIA_TYPE</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.UNUSED" href="#miniweb.utils.enumerators.Status.UNUSED">UNUSED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.UPGRADE_REQUIRED" href="#miniweb.utils.enumerators.Status.UPGRADE_REQUIRED">UPGRADE_REQUIRED</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.URI_TOO_LONG" href="#miniweb.utils.enumerators.Status.URI_TOO_LONG">URI_TOO_LONG</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.USE_PROXY" href="#miniweb.utils.enumerators.Status.USE_PROXY">USE_PROXY</a></code></li>
+<li><code><a title="miniweb.utils.enumerators.Status.VARIANT_ALSO_NEGOTIATES" href="#miniweb.utils.enumerators.Status.VARIANT_ALSO_NEGOTIATES">VARIANT_ALSO_NEGOTIATES</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

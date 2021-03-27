@@ -20,3 +20,5 @@ app.static_router(root="/var/www/subfolder/" path="/subf/", file_controller)
 
 #controller is optional parameter, we dont have to define it
 app.static_router(root="/etc/", path="/etc/")
+
+app.run()
