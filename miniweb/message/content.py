@@ -1,39 +1,42 @@
 from miniweb.core.miniweb import log
-from miniweb.utils.enumerators import Mime
+from miniweb.tools.enumerators import Mime
 import ujson
 
-def get_content(data, type):
-    '''
+
+def get_content(data, t):
+    """
     Parse incoming Content-Type to object.
     :param data: Raw Content-Data from HTTP request.
-    :param type: Content-Type of HTTP request Content-Data.
+    :param t: Content-Type of HTTP request Content-Data.
     :return: Data parsed to object.
-    '''
+    """
     result = data
-    if type == Mime.JSON:
+    if t == Mime.JSON:
         log.info("Parsing JSON string to object.")
         result = ujson.loads(data)
-    elif type == Mime.FormData:
+    elif t == Mime.FormData:
         result = FormData(data)
     else:
         log.warning("Unknown content type! Content will be accessable in raw format.")
     return result
 
 class Content():
-    '''
+    """
     Abstract class for Contents types.
-    '''
+    """
 
     def __init__(self, data):
         self.__parse_data(data)
 
+
     def __parse_data(self, data):
         pass
 
+
 class FormData(Content):
-    '''
+    """
     Child of abstract class Content. This class wrapped form data and store them to class attributes.
-    '''
+    """
 
     def __parse_data(self, data):
         log.info("Parsing FormData.")
@@ -63,38 +66,42 @@ class FormData(Content):
                 current_value = ""
                 filename = None
 
+
     def __create_file(self, filename, data):
         file_and_type = filename.split(".")
         return File(file_and_type[0], file_and_type[1], data)
 
 
 class File:
-    '''
+    """
     Class for storing file with his data, name, type.
-    '''
+    """
 
     def __init__(self, name, type, data):
         self.name = name
         self.type = type
         self.data = data
 
+
     def get_data(self):
-        '''
+        """
         Getter for data.
         :return: File data
-        '''
+        """
         return self.data
 
+
     def get_type(self):
-        '''
+        """
         Getter for type.
         :return: File type
-        '''
+        """
         return self.type
 
+
     def get_name(self):
-        '''
+        """
         Getter for name.
         :return: File name
-        '''
+        """
         return self.name
