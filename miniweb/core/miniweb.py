@@ -46,6 +46,7 @@ class Miniweb:
             self.routes = []
             self.__init_logging()
 
+
     def __init_logging(self):
         try:
             log.setLevel(self.config.log)
@@ -73,6 +74,7 @@ class Miniweb:
         self.routes.append(StaticRoute(root, path, controller))
 
     def __register_route(self, path, methods, fc):
+        log.debug("Constructor of Route class was called.")
         self.routes.append(Route(path, methods, fc))
 
     async def handle_response(self, req):
@@ -112,17 +114,23 @@ class Miniweb:
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
         """
-        log.debug("Route decorator accept function for path: "+path)
         def _route(fc):
             def wrapper(*args, **kwargs):
                 result = None
                 if (validate_consumes(consumes, args[0], args[1])) and (validate(controller, args[0], args[1])):
                     result = fc(*args, **kwargs)
                 return result
-            fullPath = controller.path+path if controller is not None else path
-            self.__register_route(fullPath, methods, wrapper)
+
+            if methods is not None and path is not None:
+                log.debug("Route decorator accept function for path: " + path)
+                fullPath = controller.path+path if controller is not None else path
+                self.__register_route(fullPath, methods, wrapper)
+            else:
+                log.warning("Route path or method is None!")
+
             return wrapper
         return _route
+
 
     def get(self, path, controller=None, consumes=None):
         """
