@@ -6,6 +6,8 @@ class Controller:
     Define them prefix in path and define middleware function only for controller routes.
     """
     def __init__(self, path, params=None):
+        if path is None:
+            path = "/default/"
         log.debug("Creating new controller: "+path)
         self.path = path
         self.params = params

@@ -11,6 +11,7 @@ class Route:
     """
     def __init__(self, path, methods, fc):
         log.info("Register route for methods: ["+', '.join(methods)+"] and path:"+path)
+        self.path = path
         self.regex, self.param_keys = self.__compile_regex(path)
         self.methods = methods
         self.fc = fc

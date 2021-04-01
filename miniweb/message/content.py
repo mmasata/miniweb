@@ -60,6 +60,7 @@ class FormData(Content):
             elif current_key is not None:
                 if current_is_file:
                     current_value = self.__create_file(filename, current_value)
+                log.debug("Set form data attribute: "+current_key)
                 setattr(self, current_key, current_value)
                 read_values = False
                 current_key = None
@@ -68,8 +69,8 @@ class FormData(Content):
 
 
     def __create_file(self, filename, data):
-        file_and_type = filename.split(".")
-        return File(file_and_type[0], file_and_type[1], data)
+        file_and_type = filename.replace('"', "").split(".")
+        return File(file_and_type[0].split("=")[1], file_and_type[1], data)
 
 
 class File:
