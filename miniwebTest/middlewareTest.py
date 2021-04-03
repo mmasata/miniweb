@@ -50,7 +50,7 @@ class MiddlewareTestCase(TestCase):
         self.assertEqual(len_before+1, len_after)
 
 
-    def test_controller_filter_not_global(self):
+    def test_filter_not_global(self):
         """
         Test of creating controller filter function.
         Function should not be add to global filter array test.
