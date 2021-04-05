@@ -26,7 +26,7 @@ Povinný parametr pro všechny je **path**. Nepovinný parametr je **controller*
 ```python
 import miniweb
 
-app = miniweb.miniweb()
+app = miniweb.app()
 
 @app.route("/foo", [Method.GET, Method.POST])
 def foo(req, res):
@@ -73,8 +73,8 @@ from miniweb import Status, Mime
 ### Statické routery
 Statické routery slouží k spravování servírování statických souborů na serveru. Lze jich nadefinovat více. Přijímají dva povinné parametry - **root**, **path** a jeden nepovinný parametr- **controller**. Parametr **root** definuje, která složka na používaném zařízení je ta výchozí (například "/var/www"). Parametr **path** naopak definuje jakýsi alias, pod kterým bude daná root cesta zadávána v endpointu *(například máme root "/var/www/subfolder/" a path "/file/", tedy když zadáme "/file/index.html", pak se vrací soubor "/var/www/subfolder/index.html")*.
 ```python
-from miniweb import miniweb
-    app = miniweb()
+from miniweb import app
+    app = app()
     
     app.static_router(root="/var/www/", path="/file/")
 ``` 
@@ -99,9 +99,9 @@ def is_logged(req, res):
 ### Controllery
 Controllery slouží pro shromažďování route do skupin. Definuje se jejich cesta. Výsledná cesta route s controllerem *je controller_path+route_path*. Mimo prefix cesty také slouží pro definice middleware funkcí právě jen pro controllery.
 ```python
-from miniweb import Controller, miniweb
+from miniweb import Controller, app
 
-app = miniweb()
+app = app()
 user_controller = Controller("/user")
 
 @app.get("/id", controller=user_controller)
@@ -112,7 +112,7 @@ def get_user_id(req, res):
 ### Konfigurace
 Konfigurovat lze dvěmi způsoby - v kódu přes konstruktor, nebo přes konfigurační soubor. Pokud jsou vyplněny obě varianty, přednost má parametrizace skrze konstruktor. Při konfiguraci přes soubor je nutné aby nadefinovaný soubor měl koncovku *.env*.
 ```python
-from miniweb import miniweb, Log
+from miniweb import app, Log
 
 params = {
     "port": 8000,
@@ -120,7 +120,7 @@ params = {
     "host": "localhost"
 }
 
-app = miniweb(params)
+app = app(params)
 
 ``` 
 V této ukázce je popsán první způsob, v následující bude z druhé, uvnitř *.env* souboru.

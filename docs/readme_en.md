@@ -26,7 +26,7 @@ The required parameter for all is the path. An optional parameter is the **contr
 ```python
 import miniweb
 
-app = miniweb.miniweb()
+app = miniweb.app()
 
 @app.route("/foo", [Method.GET, Method.POST])
 def foo(req, res):
@@ -73,8 +73,8 @@ from miniweb import Status, Mime
 ### Static routers
 Static routers are used to manage the serving of static files on the server. More can be defined. They accept two mandatory parameters - **root**, **path** and one optional parameter- **controller**. The **root** parameter defines which folder on the device you are using is the default (for example, "/var/www"). The parameter **path**, on the other hand, defines a kind of alias under which the given root path will be entered in the endpoint *(for example we have root "/var/www/subfolder/" and path "/file/", when we enter "/file/index.html", then the file "/var/www/subfolder/index.html")* is returned.
 ```python
-from miniweb import miniweb
-    app = miniweb()
+from miniweb import app
+    app = app()
     
     app.static_router(root="/var/www/", path="/file/")
 ``` 
@@ -100,9 +100,9 @@ def is_logged(req, res):
 ### Controllers
 Controllers are used to collect routes into groups. Their path is defined. The resulting route with controller * is controller_path + route_path *. In addition to the path prefix, it is also used to define middleware functions just for controllers.
 ```python
-from miniweb import Controller, miniweb
+from miniweb import Controller, app
 
-app = miniweb()
+app = app()
 user_controller = Controller("/user")
 
 @app.get("/id", controller=user_controller)
@@ -113,7 +113,7 @@ def get_user_id(req, res):
 ### Configuration
 It can be configured in two ways - in the code via the constructor or via the configuration file. If both variants are filled in, parameterization through the constructor takes precedence. When configuring via a file, it is necessary that the defined file has an extension *.env*.
 ```python
-from miniweb import miniweb, Log
+from miniweb import app, Log
 
 params = {
     "port": 8000,
@@ -121,7 +121,7 @@ params = {
     "host": "localhost"
 }
 
-app = miniweb(params)
+app = app(params)
 
 ``` 
 This example describes the first method, the following will be from the second, inside the *.env* file.
