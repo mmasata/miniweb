@@ -5,6 +5,8 @@ class Controller:
     Controller class groups routes.
     Define them prefix in path and define middleware function only for controller routes.
     """
+
+
     def __init__(self, path, params=None):
         if path is None:
             path = "/default/"
@@ -12,6 +14,7 @@ class Controller:
         self.path = path
         self.params = params
         self.filters = []
+
 
     def add_filter(self, fc):
         """

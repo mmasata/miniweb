@@ -1,5 +1,5 @@
-#Konfiguracni trida pro balikovaci system
 from setuptools import setup
+
 
 setup(
     name="miniweb",

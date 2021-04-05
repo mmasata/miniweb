@@ -7,6 +7,7 @@ class Request:
     Class for HTTP request which store parameters in class attributes.
     """
 
+
     def __init__(self):
         self.headers = {}
         self.close = False
@@ -20,6 +21,7 @@ class Request:
         :param first: Boolean if its first incoming row.
         :return: Boolean if we can continue read headers.
         """
+
         try:
             if first:
                 self.method, full_path, proto = data.split()
@@ -45,6 +47,7 @@ class Request:
         :param data: Incoming Content-Data
         :return: None
         """
+
         log.debug("Content data: \r\n"+data)
         try:
             self.content = get_content(data, self.headers["Content-Type"])

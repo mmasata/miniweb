@@ -12,6 +12,7 @@ def filter(controller=None):
     :param controller: Group router to group and define path. (optional parameter)
     :return: None
     """
+
     def _filter(fc):
         if controller is None:
             log.debug("Adding new global middleware function.")
@@ -22,6 +23,7 @@ def filter(controller=None):
         return fc
     return _filter
 
+
 def validate(controller, req, res):
     """
     Validate incoming HTTP request - run middleware function.
@@ -30,14 +32,18 @@ def validate(controller, req, res):
     :param res: Response class which will define HTTP response.
     :return: Boolean of success/fail.
     """
+
     log.info("Validate middlewares.")
     if not check_filters_group(global_filter, req, res):
         return False
+
     if controller is not None:
         if not check_filters_group(controller.filters, req, res):
             return False
+
     log.debug("Middleware function was suceed.")
     return True
+
 
 def validate_consumes(mime, req, res):
     """
@@ -47,6 +53,7 @@ def validate_consumes(mime, req, res):
     :param res:  Response class which will define HTTP response.
     :return: Boolean of success/fail.
     """
+
     log.info("Validate consumes.")
     if (mime is None) or (req.headers["Content-Type"] in mime):
         log.debug("Consumes middleware was suceed.")
@@ -65,6 +72,7 @@ def check_filters_group(f_arr, req, res):
     :param res: Response class which will define HTTP response.
     :return: Boolean of success/fail.
     """
+
     for f in f_arr:
         result = f(req, res)
         if not result:

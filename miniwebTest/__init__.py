@@ -10,4 +10,5 @@ def run_all_tests():
     Function for run all unit tests.
     :return: None
     """
+
     run_unit_tests("miniwebTest")

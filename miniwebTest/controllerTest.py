@@ -13,6 +13,7 @@ class ControllerTestCase(TestCase):
         Test of correct controller path.
         :return: Test result
         """
+
         path = "/unit/test1/"
         test_controller = Controller(path)
         self.assertEqual(path, test_controller.path)
@@ -24,6 +25,7 @@ class ControllerTestCase(TestCase):
         Should not be added, and array size of filters should be same.
         :return: Test result
         """
+
         path = "/unit/test2/"
         test_controller = Controller(path)
         len_before = len(test_controller.filters)
@@ -38,6 +40,7 @@ class ControllerTestCase(TestCase):
         Array size should be biger then before adding.
         :return: Test result
         """
+
         path = "/unit/test3/"
         test_controller = Controller(path)
         len_before = len(test_controller.filters)
@@ -58,6 +61,7 @@ class ControllerTestCase(TestCase):
         Will create controller with "/default/" path.
         :return: Test result
         """
+
         default = "/default/"
         test_controller = Controller(None)
         self.assertEqual(default, test_controller.path)

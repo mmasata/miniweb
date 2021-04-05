@@ -10,6 +10,7 @@ def get_content(data, t):
     :param t: Content-Type of HTTP request Content-Data.
     :return: Data parsed to object.
     """
+
     result = data
     if t == Mime.JSON:
         log.info("Parsing JSON string to object.")
@@ -20,10 +21,12 @@ def get_content(data, t):
         log.warning("Unknown content type! Content will be accessable in raw format.")
     return result
 
+
 class Content():
     """
     Abstract class for Contents types.
     """
+
 
     def __init__(self, data):
         self.__parse_data(data)
@@ -37,6 +40,7 @@ class FormData(Content):
     """
     Child of abstract class Content. This class wrapped form data and store them to class attributes.
     """
+
 
     def __parse_data(self, data):
         log.info("Parsing FormData.")
@@ -77,6 +81,7 @@ class File:
     """
     Class for storing file with his data, name, type.
     """
+
 
     def __init__(self, name, type, data):
         self.name = name

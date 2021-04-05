@@ -14,6 +14,7 @@ class ResponseTestCase(TestCase):
         Test of defining HTTP status to Response object.
         :return: Test result
         """
+
         res = Response()
         res.status(400)
         self.assertEqual(400, res.stat)
@@ -25,6 +26,7 @@ class ResponseTestCase(TestCase):
         Default value should be 500.
         :return: Test result
         """
+
         res = Response()
         self.assertEqual(500, res.stat)
 
@@ -34,6 +36,7 @@ class ResponseTestCase(TestCase):
         Test of defining MIME to Response object.
         :return: Test result
         """
+
         json = "application/json"
         res = Response()
         res.type(json)
@@ -45,6 +48,7 @@ class ResponseTestCase(TestCase):
         Test of defining content data to Response object.
         :return: Test result
         """
+
         d = "TEST DATA"
         res = Response()
         res.entity(d)
@@ -56,6 +60,7 @@ class ResponseTestCase(TestCase):
         Test of defining build parameter to Response object.
         :return: Test result
         """
+
         res = Response()
         res.build()
         self.assertTrue(res.can_send)
@@ -68,6 +73,7 @@ class ResponseTestCase(TestCase):
         Value should be False.
         :return: Test result
         """
+
         res = Response()
         self.assertFalse(res.can_send)
 
@@ -83,6 +89,7 @@ class ContentTestCase(TestCase):
         Test of parsing json string to dictionary.
         :return: Test result
         """
+
         json_str = '{"key":"value", "arr": [1,2,3,4]}'
         data_type = "application/json"
         response = get_content(json_str, data_type)
@@ -96,6 +103,7 @@ class ContentTestCase(TestCase):
         Should return original value.
         :return: Test result.
         """
+
         unknown_data = "Some data in unknown format!"
         data_type = "unknown/format"
         response = get_content(unknown_data, data_type)
@@ -108,6 +116,7 @@ class ContentTestCase(TestCase):
         Value should be accessable from class attribute named like original key.
         :return: Test result
         """
+
         test_data = '--BOUNDARY\r\nContent-Disposition: form-data; name="key"\r\n\r\ntestvalue\r\n--BOUNDARY'
         data_type = "multipart/form-data"
         response = get_content(test_data, data_type)
@@ -120,6 +129,7 @@ class ContentTestCase(TestCase):
         Value should be accessable from class attribute named like original key.
         :return: Test result
         """
+
         test_data = '--BOUNDARY\r\nContent-Disposition: form-data; name="multikey"\r\n\r\nfirst\r\nsecond\r\n--BOUNDARY'
         data_type = "multipart/form-data"
         response = get_content(test_data, data_type)
@@ -132,6 +142,7 @@ class ContentTestCase(TestCase):
         Framework should create own File object and stored it.
         :return: Test result
         """
+
         test_data = '''Content-Disposition: form-data; name="file"; filename="download.html"
         \r\nContent-Type: text/html"\r\n\r\n<html>TEST</html>\r\n--BOUNDARY'''
         data_type = "multipart/form-data"

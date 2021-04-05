@@ -7,6 +7,7 @@ def get_mime_by_suffix(suff):
     :param suff: File suffix.
     :return: mime type
     """
+
     log.debug("Incoming suffix to recognize Mime: "+suff)
     return suffix_file[suff]
 
@@ -15,6 +16,7 @@ class Log:
     """
     Enum class for log levels.
     """
+
     CRITICAL = 50
     ERROR = 40
     WARNING = 30
@@ -27,6 +29,7 @@ class Method:
     """
     Enum class for HTTP Methods.
     """
+
     GET = "GET"
     POST = "POST"
     PUT = "PUT"
@@ -37,6 +40,7 @@ class Mime:
     """
     Enum class for file types.
     """
+
     JSON = "application/json"
     FormData = "multipart/form-data"
     HTML = "text/html"
@@ -51,26 +55,11 @@ class Mime:
     SVG = "image/svg+xml"
 
 
-suffix_file = {
-    "html": Mime.HTML,
-    "htm": Mime.HTML,
-    "css": Mime.CSS,
-    "js": Mime.JS,
-    "txt": Mime.PLAIN,
-    "csv": Mime.CSV,
-    "md": Mime.MD,
-    "jpg": Mime.JPG,
-    "jpeg": Mime.JPG,
-    "png": Mime.PNG,
-    "bmp": Mime.BMP,
-    "svg": Mime.SVG
-}
-
-
 class Status:
     """
     Enum class for HTTP statuses.
     """
+
     CONTINUE = 100
     SWITCHING_PROTOCOL = 101
     PROCESSING = 102
@@ -135,4 +124,19 @@ class Status:
     NOT_EXTENDED = 510
     NETWORK_AUTHENTICATION_REQUIRED = 511
 
+
+suffix_file = {
+    "html": Mime.HTML,
+    "htm": Mime.HTML,
+    "css": Mime.CSS,
+    "js": Mime.JS,
+    "txt": Mime.PLAIN,
+    "csv": Mime.CSV,
+    "md": Mime.MD,
+    "jpg": Mime.JPG,
+    "jpeg": Mime.JPG,
+    "png": Mime.PNG,
+    "bmp": Mime.BMP,
+    "svg": Mime.SVG
+}
 

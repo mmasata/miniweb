@@ -9,6 +9,7 @@ class Config:
     """
     __instance = None
 
+
     @staticmethod
     def get_instance(params=None):
         """
@@ -20,6 +21,7 @@ class Config:
             Config(params)
         return Config.__instance
 
+
     def __init__(self, params=None):
         if Config.__instance is not None:
             raise SingletonExpcetion("Cannot create new instance of Config class. Its Singleton.")
@@ -29,6 +31,7 @@ class Config:
                 self.__get_params_from_config_file()
             else:
                 self.__assign_variables(params)
+
 
     def __get_params_from_config_file(self):
         params = {}
@@ -43,6 +46,7 @@ class Config:
             raise FileException("No config file was found!")
         self.__assign_variables(params)
 
+
     def __find_file(self):
         ld = os.ilistdir()
         fn = None
@@ -51,6 +55,7 @@ class Config:
                 fn = f[0]
                 break
         return fn
+
 
     def __assign_variables(self, par):
         for key in par:

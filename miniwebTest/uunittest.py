@@ -159,7 +159,7 @@ class TestRunner:
         for c in suite.tests:
             run_class(c, res)
 
-        print("Ran %d tests\n" % res.testsRun)
+        print("Run %d tests\n" % res.testsRun)
         if res.failuresNum > 0 or res.errorsNum > 0:
             print("FAILED (failures=%d, errors=%d)" % (res.failuresNum, res.errorsNum))
         else:

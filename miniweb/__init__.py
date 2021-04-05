@@ -1,4 +1,3 @@
-#Init modul pro lepsi spravu importu
 from miniweb.core.miniweb import app
 from miniweb.entity.middleware import filter
 from miniweb.entity.controller import Controller

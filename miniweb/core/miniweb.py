@@ -26,6 +26,7 @@ class Miniweb:
     """
     __inst = None
 
+
     @staticmethod
     def get_instance(par=None):
         """
@@ -33,9 +34,11 @@ class Miniweb:
         :param par: Dictionary with configuration parameters. (optional parameter)
         :return: Miniweb object instance.
         """
+
         if Miniweb.__inst is None:
             Miniweb(par)
         return Miniweb.__inst
+
 
     def __init__(self, par=None):
         if Miniweb.__inst is not None:
@@ -54,13 +57,16 @@ class Miniweb:
         except:
             raise ConfigParamsException("Miniweb log level is missing!")
 
+
     def run(self):
         """
         Create Server object instance and run it.
         :return: None
         """
+
         log.debug("Miniweb send request to initialize Server.")
         Server.get_instance(self)
+
 
     def static_router(self, root, path, controller=None):
         """
@@ -70,21 +76,24 @@ class Miniweb:
         :param controller: Group router to group and define path. (optional parameter)
         :return: None
         """
+
         log.info("Static file server was enabled in root: "+root)
         self.routes.append(StaticRoute(root, path, controller))
+
 
     def __register_route(self, path, methods, fc):
         log.debug("Constructor of Route class was called.")
         self.routes.append(Route(path, methods, fc))
 
-    async def handle_response(self, req):
+
+    async def handle_response(self, req, res):
         """
         From request object find route and call route function. Return response.
         :param req: HTTP request wrapped inside of Request class.
         :return: Response object instance.
         """
+
         route, params = await self.__find_route(req)
-        res = Response()
         if route is None:
             return res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
         if params is not None:
@@ -92,6 +101,7 @@ class Miniweb:
         else:
             route.fc(req, res)
         return res
+
 
     async def __find_route(self, req):
         for route in self.routes:
@@ -104,6 +114,7 @@ class Miniweb:
         log.info("Route for request was not found.")
         return None, None
 
+
     def route(self, path, methods, controller=None, consumes=None):
         """
         DECORATOR
@@ -114,6 +125,7 @@ class Miniweb:
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
         """
+
         def _route(fc):
             def wrapper(*args, **kwargs):
                 result = None
@@ -141,9 +153,11 @@ class Miniweb:
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
         """
+
         def _inner(fc):
             return self.route(path, [Method.GET], controller, consumes)(fc)
         return _inner
+
 
     def post(self, path, controller=None, consumes=None):
         """
@@ -154,9 +168,11 @@ class Miniweb:
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
         """
+
         def _inner(fc):
             return self.route(path, [Method.POST], controller, consumes)(fc)
         return _inner
+
 
     def put(self, path, controller=None, consumes=None):
         """
@@ -167,9 +183,11 @@ class Miniweb:
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
         """
+
         def _inner(fc):
             return self.route(path, [Method.PUT], controller, consumes)(fc)
         return _inner
+
 
     def delete(self, path, controller=None, consumes=None):
         """
@@ -180,7 +198,7 @@ class Miniweb:
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
         """
+
         def _inner(fc):
             return self.route(path, [Method.DELETE], controller, consumes)(fc)
         return _inner
-
