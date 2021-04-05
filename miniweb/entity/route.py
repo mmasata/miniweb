@@ -50,30 +50,32 @@ class Route:
             raise CompileRegexException("Error with compiling regex in route class!")
 
 
-    def match_with_vars(self, path):
+    def is_match(self, path):
         """
         Accept current path from HTTP request and looking for match with current route.
-        If found try also found path parameters.
         :param path: Incoming path from HTTP request.
-        :return: Boolean of match; path parameters in dictionary
+        :return: Boolean of match
         """
 
         log.debug("Looking for route match \r\n path: "+path+"\r\n reg: "+self.regex_str)
-        match = ure.match(self.regex, path) is not None
+        return ure.match(self.regex, path) is not None
+
+
+    def get_path_params(self, path):
+        """
+        Accept current path from HTTP request and try found path parameters.
+        :param path: Incoming path from HTTP request.
+        :return: path parameters in dictionary
+        """
+
         params = None
-        if match:
-            if len(self.param_keys) > 0:
-                params = self.__find_vars(path)
-        return match, params
-
-
-    def __find_vars(self, path):
-        log.debug("Getting variables from path.")
-        params = {}
-        split_path = path.split("/")
-        slash_arr_size = len(self.num_slashes)
-        for i in range(0, slash_arr_size):
-            params[self.param_keys[i]] = split_path[self.num_slashes[i]]
+        if len(self.param_keys) > 0:
+            log.debug("Getting variables from path.")
+            params = {}
+            split_path = path.split("/")
+            slash_arr_size = len(self.num_slashes)
+            for i in range(0, slash_arr_size):
+                params[self.param_keys[i]] = split_path[self.num_slashes[i]]
         return params
 
 
@@ -85,22 +87,12 @@ class StaticRoute(Route):
 
     def __init__(self, root, path, controller=None):
         self.file_path = path if controller is None else controller.path+path
+        self.root = root
         log.info("Creating static route.")
 
         def find_file(req, res):
-
             if validate(controller, req, res):
-                try:
-                    log.info("Looking for static file.")
-                    destination_file = req.path.replace(self.file_path, root, 1)
-                    log.debug("Destination path should be: "+destination_file)
-                    f = open(destination_file)
-                    suff = destination_file.split('.')[1]
-                    mime = get_mime_by_suffix(suff)
-                    res.status(Status.OK).type(mime).entity(f).build()
-                except:
-                    log.warning("File was not found!")
-                    res.status(Status.NOT_FOUND).type(Mime.HTML).entity(file_not_found(req.path)).build()
+                res.status(Status.OK).type(self.mime).entity(self.file).build()
 
         super().__init__(path, "GET", find_file)
 
@@ -111,3 +103,17 @@ class StaticRoute(Route):
             return ure.compile(self.regex_str), []
         except:
             raise CompileRegexException("Error with compiling regex in static route class!")
+
+
+    def is_match(self, path):
+        try:
+            log.info("Looking for static file.")
+            destination_file = path.replace(self.file_path, self.root, 1)
+            log.debug("Destination path should be: " + destination_file)
+            self.file = open(destination_file)
+            suff = destination_file.split('.')[1]
+            self.mime = get_mime_by_suffix(suff)
+            return True
+        except:
+            log.debug("Match with static route was not found.")
+            return False

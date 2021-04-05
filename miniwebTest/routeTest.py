@@ -221,7 +221,7 @@ class RouteTestCase(TestCase):
         match = False
         for route in app.routes:
             if route.path is path:
-                match, params = route.match_with_vars(match_param)
+                match = route.is_match(match_param)
                 break
         self.assertTrue(match)
 
@@ -245,7 +245,7 @@ class RouteTestCase(TestCase):
         match = False
         for route in app.routes:
             if route.path is path:
-                match, params = route.match_with_vars(match_param)
+                match = route.is_match(match_param)
                 break
         self.assertFalse(match)
 
@@ -274,7 +274,7 @@ class RouteTestCase(TestCase):
         params = None
         for route in app.routes:
             if route.path is path:
-                match, params = route.match_with_vars(match_param)
+                params = route.get_path_params(match_param)
                 break
 
         is_equal = params_check == params

@@ -105,12 +105,11 @@ class Miniweb:
 
     async def __find_route(self, req):
         for route in self.routes:
-            if req.method in route.methods:
-                match, params = route.match_with_vars(req.path)
-                if match:
-                    log.info("Match with request and route was found.")
-                    log.debug("Request match with regex: "+route.regex_str)
-                    return route, params
+            if (req.method in route.methods) and (route.is_match(req.path)):
+                params = route.get_path_params(req.path)
+                log.info("Match with request and route was found.")
+                log.debug("Request match with regex: "+route.regex_str)
+                return route, params
         log.info("Route for request was not found.")
         return None, None
 

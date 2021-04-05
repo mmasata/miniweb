@@ -89,16 +89,14 @@ class Server:
 
     async def __send_data(self, res, writer):
         log.debug("Sending response data")
-        data_type = res.ent.__class__.__name__
-
-        if data_type == "TextIOWrapper":
+        if res.ent.__class__.__name__ == "TextIOWrapper":
             log.debug("Sending file/s.")
             b_arr = bytearray(res.buffer_size)
+
             while True:
                 data = res.ent.readinto(b_arr)
                 if not data:
                     break
-                log.debug("Sending another file bytes to client...")
                 await writer.awrite(b_arr, 0, data)
         else:
             await writer.awrite(res.ent)
