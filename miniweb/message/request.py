@@ -12,21 +12,22 @@ class Request:
         self.headers = {}
         self.close = False
         self.content_read = False
+        self.has_path = False
 
 
-    async def parse_header(self, data, first=False):
+    async def parse_header(self, data):
         """
         Accept HTTP request header in raw and parse them and store to attribute.
         :param data: Incoming header row.
-        :param first: Boolean if its first incoming row.
         :return: Boolean if we can continue read headers.
         """
 
         try:
-            if first:
+            if not self.has_path:
                 self.method, full_path, proto = data.split()
                 log.info("Incoming request "+self.method+" "+full_path)
                 await self.__find_query_params(full_path)
+                self.has_path = True
             else:
                 header, value = data.split(": ")
                 self.headers[header] = value.replace("\r\n", "")

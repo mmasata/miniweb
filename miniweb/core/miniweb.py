@@ -11,12 +11,14 @@ from miniweb.tools.templates import *
 from miniweb.entity.config import Config
 from miniweb.exception.exception import *
 
+
 def app(par=None):
     """
     Return the Miniweb object instance.
     :param par: Dictionary with configuration parameters. (optional parameter)
     :return: Miniweb object instance.
     """
+
     return Miniweb.get_instance(par)
 
 
@@ -24,6 +26,7 @@ class Miniweb:
     """
     Singleton class. It is container for all other framework objects.
     """
+
     __inst = None
 
 
@@ -44,13 +47,14 @@ class Miniweb:
         if Miniweb.__inst is not None:
             log.error("Attempt to create more than one instances of miniweb.")
         else:
-            self.config = Config.get_instance(par)
             Miniweb.__inst = self
+            self.config = Config.get_instance(par)
             self.routes = []
-            self.__init_logging()
+
+            self.__enable_log()
 
 
-    def __init_logging(self):
+    def __enable_log(self):
         try:
             log.setLevel(self.config.log)
             log.info("Inicialize miniweb")
@@ -81,7 +85,7 @@ class Miniweb:
         self.routes.append(StaticRoute(root, path, controller))
 
 
-    def __register_route(self, path, methods, fc):
+    def __reg_route(self, path, methods, fc):
         log.debug("Constructor of Route class was called.")
         self.routes.append(Route(path, methods, fc))
 
@@ -94,12 +98,14 @@ class Miniweb:
         """
 
         route, params = await self.__find_route(req)
+
         if route is None:
-            return res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
-        if params is not None:
-            route.fc(req, res, params)
+            res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
         else:
-            route.fc(req, res)
+            if params is None:
+                route.fc(req, res)
+            else:
+                route.fc(req, res, params)
         return res
 
 
@@ -134,8 +140,9 @@ class Miniweb:
 
             if methods is not None and path is not None:
                 log.debug("Route decorator accept function for path: " + path)
-                fullPath = controller.path+path if controller is not None else path
-                self.__register_route(fullPath, methods, wrapper)
+
+                full_path = controller.path+path if controller is not None else path
+                self.__reg_route(full_path, methods, wrapper)
             else:
                 log.warning("Route path or method is None!")
 

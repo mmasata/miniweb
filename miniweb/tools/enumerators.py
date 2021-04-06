@@ -1,13 +1,14 @@
 from miniweb.core.miniweb import log
 
 
-def get_mime_by_suffix(suff):
+def get_mime_by_suffix(destination_file):
     """
     Find mime type by incoming file suffix.
     :param suff: File suffix.
     :return: mime type
     """
 
+    suff = destination_file.split('.')[1]
     log.debug("Incoming suffix to recognize Mime: "+suff)
     return suffix_file[suff]
 

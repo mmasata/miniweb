@@ -48,11 +48,11 @@ class Response:
         return self
 
 
-    def build(self, buffer_size=256):
+    def build(self):
         """
         Send response to client and mark it as finished.
         :return: self
         """
-        self.buffer_size = buffer_size
+
         self.can_send = True
         return self

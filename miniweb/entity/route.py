@@ -13,6 +13,7 @@ class Route:
 
     def __init__(self, path, methods, fc):
         log.info("Register route for methods: ["+', '.join(methods)+"] and path:"+path)
+
         self.path = path
         self.regex, self.param_keys = self.__compile_regex(path)
         self.methods = methods
@@ -71,11 +72,14 @@ class Route:
         params = None
         if len(self.param_keys) > 0:
             log.debug("Getting variables from path.")
+
             params = {}
             split_path = path.split("/")
             slash_arr_size = len(self.num_slashes)
+
             for i in range(0, slash_arr_size):
                 params[self.param_keys[i]] = split_path[self.num_slashes[i]]
+
         return params
 
 
@@ -88,13 +92,14 @@ class StaticRoute(Route):
     def __init__(self, root, path, controller=None):
         self.file_path = path if controller is None else controller.path+path
         self.root = root
+
         log.info("Creating static route.")
 
-        def find_file(req, res):
+        def _inner(req, res):
             if validate(controller, req, res):
                 res.status(Status.OK).type(self.mime).entity(self.file).build()
 
-        super().__init__(path, "GET", find_file)
+        super().__init__(path, "GET", _inner)
 
 
     def __compile_regex(self, url):
@@ -107,12 +112,13 @@ class StaticRoute(Route):
 
     def is_match(self, path):
         try:
-            log.info("Looking for static file.")
             destination_file = path.replace(self.file_path, self.root, 1)
+
+            log.info("Looking for static file.")
             log.debug("Destination path should be: " + destination_file)
+
             self.file = open(destination_file)
-            suff = destination_file.split('.')[1]
-            self.mime = get_mime_by_suffix(suff)
+            self.mime = get_mime_by_suffix(destination_file)
             return True
         except:
             log.debug("Match with static route was not found.")
