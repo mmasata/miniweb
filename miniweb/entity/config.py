@@ -24,7 +24,7 @@ class Config:
 
     def __init__(self, params=None):
         if Config.__instance is not None:
-            raise SingletonExpcetion("Cannot create new instance of Config class. Its Singleton.")
+            raise SingletonExpcetion("Cannot create new instance of Config class. Its Singleton!")
         else:
             Config.__instance = self
             if params is None:

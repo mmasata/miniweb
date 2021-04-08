@@ -1,10 +1,11 @@
 import uasyncio as asyncio
+import gc
+import ujson
+
 from miniweb.message.request import Request
 from miniweb.message.response import Response
 from miniweb.core.miniweb import log
 from miniweb.exception.exception import *
-import gc
-import ujson
 
 
 class Server:
@@ -28,7 +29,7 @@ class Server:
 
     def __init__(self, miniweb):
         if Server.__instance is not None:
-            log.error("Cannot create new instance of Server class. Its Singleton.")
+            log.error("Cannot create new instance of Server class. Its Singleton!")
         else:
             self.miniweb = miniweb
             self.config = miniweb.config
@@ -44,7 +45,7 @@ class Server:
         except:
             raise ConfigParamsException("Host or port is missing!")
 
-        log.info("Server is running on "+self.config.host+" port:"+str(self.config.port))
+        log.info("Server is running on {h} with port: {p}.".format(h=self.config.host, p=self.config.port))
 
         e_loop = asyncio.get_event_loop()
         e_loop.create_task(server_task)

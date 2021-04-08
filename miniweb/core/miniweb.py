@@ -4,9 +4,7 @@ log = logging.getLogger("miniweb")
 
 from miniweb.entity.middleware import validate, validate_consumes
 from miniweb.core.server import Server
-from miniweb.tools.enumerators import Method, Status, Mime
 from miniweb.entity.route import Route, StaticRoute
-from miniweb.message.response import Response
 from miniweb.tools.templates import *
 from miniweb.entity.config import Config
 from miniweb.exception.exception import *
@@ -45,7 +43,7 @@ class Miniweb:
 
     def __init__(self, par=None):
         if Miniweb.__inst is not None:
-            log.error("Attempt to create more than one instances of miniweb.")
+            log.error("Attempt to create more than one instances of miniweb!")
         else:
             Miniweb.__inst = self
             self.config = Config.get_instance(par)
@@ -57,7 +55,7 @@ class Miniweb:
     def __enable_log(self):
         try:
             log.setLevel(self.config.log)
-            log.info("Inicialize miniweb")
+            log.info("Logging was enabled. Level: {l}".format(l=self.config.log))
         except:
             raise ConfigParamsException("Miniweb log level is missing!")
 
@@ -81,7 +79,7 @@ class Miniweb:
         :return: None
         """
 
-        log.info("Static file server was enabled in root: "+root)
+        log.info("Static file server was enabled in root: {r}.".format(r=root))
         self.routes.append(StaticRoute(root, path, controller))
 
 
@@ -100,7 +98,7 @@ class Miniweb:
         route, params = await self.__find_route(req)
 
         if route is None:
-            res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
+            res.status(404).type("text/html").entity(not_found(req.path, req.method)).build()
         else:
             if params is None:
                 route.fc(req, res)
@@ -114,7 +112,7 @@ class Miniweb:
             if (req.method in route.methods) and (route.is_match(req.path)):
                 params = route.get_path_params(req.path)
                 log.info("Match with request and route was found.")
-                log.debug("Request match with regex: "+route.regex_str)
+                log.debug("Request match with regex: {re}.".format(re=route.regex_str))
                 return route, params
         log.info("Route for request was not found.")
         return None, None
@@ -139,7 +137,7 @@ class Miniweb:
                 return result
 
             if methods is not None and path is not None:
-                log.debug("Route decorator accept function for path: " + path)
+                log.debug("Route decorator accept function for path: p.".format(p=path))
 
                 full_path = controller.path+path if controller is not None else path
                 self.__reg_route(full_path, methods, wrapper)
@@ -161,7 +159,7 @@ class Miniweb:
         """
 
         def _inner(fc):
-            return self.route(path, [Method.GET], controller, consumes)(fc)
+            return self.route(path, ["GET"], controller, consumes)(fc)
         return _inner
 
 
@@ -176,7 +174,7 @@ class Miniweb:
         """
 
         def _inner(fc):
-            return self.route(path, [Method.POST], controller, consumes)(fc)
+            return self.route(path, ["POST"], controller, consumes)(fc)
         return _inner
 
 
@@ -191,7 +189,7 @@ class Miniweb:
         """
 
         def _inner(fc):
-            return self.route(path, [Method.PUT], controller, consumes)(fc)
+            return self.route(path, ["PUT"], controller, consumes)(fc)
         return _inner
 
 
@@ -206,5 +204,5 @@ class Miniweb:
         """
 
         def _inner(fc):
-            return self.route(path, [Method.DELETE], controller, consumes)(fc)
+            return self.route(path, ["DELETE"], controller, consumes)(fc)
         return _inner

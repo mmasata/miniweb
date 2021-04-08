@@ -1,6 +1,6 @@
 from miniweb.core.miniweb import log
 from miniweb.exception.exception import *
-from .content import *
+from .content import get_content
 
 class Request:
     """
@@ -25,18 +25,21 @@ class Request:
         try:
             if not self.has_path:
                 self.method, full_path, proto = data.split()
-                log.info("Incoming request "+self.method+" "+full_path)
+                log.info("Incoming HTTP request {m} {p}.".format(m=self.method, p=full_path))
+
                 await self.__find_query_params(full_path)
                 self.has_path = True
             else:
                 header, value = data.split(": ")
                 self.headers[header] = value.replace("\r\n", "")
-                log.debug("Header "+header+": "+self.headers[header])
+                log.debug("Header\n {k}: {v}".format(k=header, v=self.headers[header]))
+
                 if "Content-Length" == header:
                     self.headers["Content-Type"] = self.headers["Content-Type"].split(";")[0]
                     self.content_len = int(value)
                     self.content_read = self.content_len > 0
                     return False
+
             return True
         except HeaderException:
             log.error("Error during read of request headers!")
@@ -59,12 +62,15 @@ class Request:
     async def __find_query_params(self, full_path):
         if "?" in full_path:
             log.debug("Parsing query params.")
-            self.path, q_par_str = full_path.split("?", 1)
-            q_par_arr = q_par_str.split("&")
+
             self.params = {}
+            self.path, q_par_str = full_path.split("?", 1)
+
+            q_par_arr = q_par_str.split("&")
             for par in q_par_arr:
                 key, value = par.split("=")
-                log.debug("Query param "+key+": "+value)
                 self.params[key] = value
+
+                log.debug("Query param\n {k}: {v}".format(k=key, v=value))
         else:
             self.path = full_path

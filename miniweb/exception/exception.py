@@ -26,3 +26,4 @@ class HeaderException(Exception):
 class ContentTypeException(Exception):
     """Request content type exception"""
     pass
+

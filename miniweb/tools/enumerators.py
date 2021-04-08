@@ -9,7 +9,7 @@ def get_mime_by_suffix(destination_file):
     """
 
     suff = destination_file.split('.')[1]
-    log.debug("Incoming suffix to recognize Mime: "+suff)
+    log.debug("Incoming suffix to recognize Mime: {s}.".format(s=suff))
     return suffix_file[suff]
 
 

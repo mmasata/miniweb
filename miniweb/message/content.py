@@ -1,5 +1,4 @@
 from miniweb.core.miniweb import log
-from miniweb.tools.enumerators import Mime
 import ujson
 
 
@@ -12,10 +11,10 @@ def get_content(data, t):
     """
 
     result = data
-    if t == Mime.JSON:
+    if t == "application/json":
         log.info("Parsing JSON string to object.")
         result = ujson.loads(data)
-    elif t == Mime.FormData:
+    elif t == "multipart/form-data":
         result = FormData(data)
     else:
         log.warning("Unknown content type! Content will be accessable in raw format.")
@@ -64,7 +63,8 @@ class FormData(Content):
             elif current_key is not None:
                 if current_is_file:
                     current_value = self.__create_file(filename, current_value)
-                log.debug("Set form data attribute: "+current_key)
+
+                log.debug("Set form data attribute with key: {k}.".format(k=current_key))
                 setattr(self, current_key, current_value)
                 read_values = False
                 current_key = None

@@ -20,7 +20,7 @@ class Response:
         :return: self
         """
 
-        log.debug("Response status was set to "+str(status))
+        log.debug("Response status was set to {s}.".format(s=status))
         self.stat = status
         return self
 
@@ -43,7 +43,7 @@ class Response:
         :return: self
         """
 
-        log.debug("Response type was set to "+mime)
+        log.debug("Response type was set to {m}.".format(m=mime))
         self.mime = mime
         return self
 
@@ -54,5 +54,6 @@ class Response:
         :return: self
         """
 
+        log.debug("Response was marked as builded.")
         self.can_send = True
         return self

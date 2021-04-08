@@ -10,7 +10,9 @@ class Controller:
     def __init__(self, path, params=None):
         if path is None:
             path = "/default/"
-        log.debug("Creating new controller: "+path)
+
+        log.debug("Creating new controller with path: {p}.".format(p=path))
+
         self.path = path
         self.params = params
         self.filters = []

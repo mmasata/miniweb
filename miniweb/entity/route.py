@@ -12,7 +12,7 @@ class Route:
 
 
     def __init__(self, path, methods, fc):
-        log.info("Register route for methods: ["+', '.join(methods)+"] and path:"+path)
+        log.info("Register route for method/s: {m} and path: {p}.".format(m=methods, p=path))
 
         self.path = path
         self.regex, self.param_keys = self.__compile_regex(path)
@@ -23,6 +23,7 @@ class Route:
     def __compile_regex(self, url):
         try:
             log.debug("Compile url to regex.")
+
             self.num_slashes = []
             slash = 0
             params = []
@@ -57,8 +58,7 @@ class Route:
         :param path: Incoming path from HTTP request.
         :return: Boolean of match
         """
-
-        log.debug("Looking for route match \r\n path: "+path+"\r\n reg: "+self.regex_str)
+        log.debug("Looking for route match.\n Path: {p}\n Regex: {r}".format(p=path, r=self.regex_str))
         return ure.match(self.regex, path) is not None
 
 
@@ -71,7 +71,7 @@ class Route:
 
         params = None
         if len(self.param_keys) > 0:
-            log.debug("Getting variables from path.")
+            log.debug("Getting path variables from path.")
 
             params = {}
             split_path = path.split("/")
@@ -99,12 +99,12 @@ class StaticRoute(Route):
             if validate(controller, req, res):
                 res.status(Status.OK).type(self.mime).entity(self.file).build()
 
-        super().__init__(path, "GET", _inner)
+        super().__init__(path, ["GET"], _inner)
 
 
     def __compile_regex(self, url):
         try:
-            self.regex_str = "^"+self.file_path+"\S+"
+            self.regex_str = "^{p}\S+".format(p=self.file_path)
             return ure.compile(self.regex_str), []
         except:
             raise CompileRegexException("Error with compiling regex in static route class!")
@@ -115,7 +115,7 @@ class StaticRoute(Route):
             destination_file = path.replace(self.file_path, self.root, 1)
 
             log.info("Looking for static file.")
-            log.debug("Destination path should be: " + destination_file)
+            log.debug("File destination path should be {df}.".format(df=destination_file))
 
             self.file = open(destination_file)
             self.mime = get_mime_by_suffix(destination_file)

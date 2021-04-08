@@ -1,9 +1,9 @@
 from miniweb.core.miniweb import log
-from miniweb.tools.enumerators import *
 from miniweb.tools.templates import *
-from miniweb.message.response import *
+
 
 global_filter = []
+
 
 def filter(controller=None):
     """
@@ -18,7 +18,7 @@ def filter(controller=None):
             log.debug("Adding new global middleware function.")
             global_filter.append(fc)
         else:
-            log.debug("Adding new controller middleware function for controller: "+controller.path)
+            log.debug("Adding new controller middleware function for controller with path: {p}".format(p=controller.path))
             controller.add_filter(fc)
         return fc
     return _filter
@@ -60,7 +60,7 @@ def validate_consumes(mime, req, res):
         return True
     else:
         log.warning("Consumes middleware failed!")
-        res.type(Mime.HTML).entity(consume_error(req.headers["Content-Type"])).status(Status.BAD_REQUEST).build()
+        res.type("text/html").entity(consume_error(req.headers["Content-Type"])).status(400).build()
         return False
 
 
@@ -76,6 +76,6 @@ def check_filters_group(f_arr, req, res):
     for f in f_arr:
         result = f(req, res)
         if not result:
-            log.warning("Middleware function failed: "+f.__name__)
+            log.warning("Middleware function {fc} failed.".format(fc=f.__name__))
             return False
     return True
