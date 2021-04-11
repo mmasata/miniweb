@@ -10,12 +10,6 @@ Miniweb je jednoduchý web aplikační framework určený pro mikročipy (primá
  - ujson
  - ure
 
-## Požadavky na zprovoznění
-1. [Stáhnout micropip](https://pypi.org/project/micropython-upip/)
-*Pozn. Následující knihovny stáhnout přes micropip (také upip)*
-2. [Stáhnout asyncio](https://pypi.org/project/micropython-uasyncio/)
-3. [Stáhnout micropython-logging](https://pypi.org/project/micropython-logging/)
-
 ## API
 
 ### Route
@@ -117,7 +111,8 @@ from miniweb import app, Log
 params = {
     "port": 8000,
     "log": Log.DEBUG,
-    "host": "localhost"
+    "host": "localhost",
+    "buffer": 512
 }
 
 app = app(params)
@@ -129,6 +124,7 @@ V této ukázce je popsán první způsob, v následující bude z druhé, uvnit
 port=8000
 log=DEBUG
 host=127.0.0.1
+buffer=512
 ``` 
 Úroveň logu je uváděna Stringu a všechna písmena musí být velká.
 
