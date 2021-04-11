@@ -9,13 +9,6 @@ Miniweb is a simple web application framework designed for microchips (primary E
  - ujson
  - ure
 
-## Requirements
-1. [Download micropip](https://pypi.org/project/micropython-upip/)
-*Note: Download the following libraries via micropip (also upip)*
-2. [Download asyncio](https://pypi.org/project/micropython-uasyncio/)
-3. [Download micropython-logging](https://pypi.org/project/micropython-logging/)
-
-
 ## API
 
 ### Route
@@ -118,7 +111,8 @@ from miniweb import app, Log
 params = {
     "port": 8000,
     "log": Log.DEBUG,
-    "host": "localhost"
+    "host": "localhost",
+    "buffer": 512
 }
 
 app = app(params)
@@ -130,6 +124,7 @@ This example describes the first method, the following will be from the second, 
 port=8000
 log=DEBUG
 host=127.0.0.1
+buffer=512
 ``` 
 The log level is specified by the String and all letters must be uppercase.
 
