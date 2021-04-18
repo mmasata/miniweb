@@ -1,8 +1,19 @@
-from miniweb import miniweb, filter, Status
+from miniweb import app, filter, Status, Log
 
-app = miniweb()
+
+params = {
+    "port": 8000,
+    "host": "0.0.0.0",
+    "log": Log.INFO,
+    "buffer": 128
+}
+
+
+app = app(params)
+
 
 user_controller = Controller("/user")
+
 
 @filter()
 def global_middleware(req, res):
@@ -10,6 +21,7 @@ def global_middleware(req, res):
 
     #middleware passed
     return True
+
 
 @filter(user_controller)
 def user_middleware(req, res):
@@ -19,6 +31,7 @@ def user_middleware(req, res):
     #without response, so client will wait until timeout
     return False
 
+
 @filter()
 def another_middleware(req, res):
     #client get response message
@@ -26,5 +39,6 @@ def another_middleware(req, res):
 
     #middleware failed, route function will not be called
     return False
+
 
 app.run()

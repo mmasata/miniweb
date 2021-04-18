@@ -1,3 +1,20 @@
+# Obsah
+* [Základní informace](#základní-informace)
+* [Používané knihovny třetích stran](#používané-knihovny-třetích-stran)
+* [API](#api)
+    * [Route](#route)
+        * [Request](#request)
+        * [Response](#response)
+    * [Statické routery](#statické-routery)
+    * [Middleware funkce](#middleware-funkce)
+    * [Controllery](#controllery)
+    * [Konfigurace](#konfigurace)
+        * [Seznam konfiguračních parametrů](#seznam-konfiguračních-parametrů)
+    * [Enumerátory](#enumerátory)
+
+
+
+
 ## Základní informace
 Miniweb je jednoduchý web aplikační framework určený pro mikročipy (primárně ESP8266 a popřípadě ESP32) s důrazem na výkon. Byl vyvinut jako Bakalářská práce, ale bude i dále rozvíjen.
 
@@ -15,18 +32,37 @@ Miniweb je jednoduchý web aplikační framework určený pro mikročipy (primá
 ### Route
 
 Definuje se skrze dekorátor. Obsahuje 4 univerzální funkce a jednu obecnou - *get()*, *post()*, *put()*, *delete()* a *route()*. U obecné je nutné nadefinovat HTTP metodu (či více HTTP metod).
+
 Povinný parametr pro všechny je **path**. Nepovinný parametr je **controller**, který může shlukovat route do skupin. Dalším nepovinným parametrem je **consumes**, které nadefinuje pole akceptovatelných příchozích Content-Type.
 
 ```python
 import miniweb
 
+
 app = miniweb.app()
+
 
 @app.route("/foo", [Method.GET, Method.POST])
 def foo(req, res):
    pass
 
+
 @app.get("/bar")
+def bar(req, res):
+   pass
+
+
+@app.post("/bar")
+def bar(req, res):
+   pass
+
+
+@app.put("/bar")
+def bar(req, res):
+   pass
+
+
+@app.delete("/bar")
 def bar(req, res):
    pass
 ``` 
@@ -41,27 +77,56 @@ def bar(req, res):
 #### Request
 Z requestu je možné přistoupit k headers, query parametrům, či kontentu z těla requestu. Request umí zpracovávat Json a Form Data do objektu, aby byla lehce použitelná pro vývojáře. Když miniweb příchozí content-type nezná, jsou data přístupná pouze jako String.
 ```python
-    query_parameter_key = request.params["key"]
-    request_content = request.content
+   from miniweb import app
+  
+
+    #/foo?key=1
+    #body: {id: 2, arr: ["a", "b", "c"]}
+    @app.post("/foo"):
+    def foo(request, res):
+
+      query_parameter_key = request.params["key"]
+      request_content = request.content
     
-    #pokud je content json lze pristupovat pres klice
-    json_key_id = request.content["id"]
+      #pokud je content json lze pristupovat pres klice
+      json_key_id = request.content["id"]
+
     
-    #pokud je content multipart/form-data pristupuje se pres atributy objektu
-    file = request.content.file
-    value = request.content.value
-    multilinevalue = request.content.multilinevalue
+    #Content-Type: "multipart/form-data"
+    # file: image.jpg
+    # value: 22
+    # multilinevalue: line1
+    #                 line2
+    @app.post("/bar")
+    def bar(request, res):
+
+      #pokud je content multipart/form-data pristupuje se pres atributy objektu
+      file = request.content.file
+      value = request.content.value
+      multilinevalue = request.content.multilinevalue
     
-    #pristup k headers
-    headers = request.headers
-    content_type = headers["Content-Type"]
+      #pristup k headers
+      headers = request.headers
+      content_type = headers["Content-Type"]
 ``` 
 
 #### Response
 U response je možné nadefinovat status, content-type a samotnou entitu. Vše se děje přes builder. Když už je Response finální, musí být použita metoda *build()*.
 ```python
-from miniweb import Status, Mime
+from miniweb import Status, Mime, app
+    #ukázka mimo funkci
     Response().status(Status.OK).type(Mime.HTML).entity("<h1>Ahoj, světe!</h1>").build()
+
+
+    @app.get("/foo")
+    def foo(req, res):
+
+       #lze poslat dictionary, framework se postara o poslani jako json string
+       dict = {
+         "key": "value",
+         "arr": [1, 2, 3, 4] 
+       }
+       res.status(Status.OK).type("application/json").entity(dict).build()
 ``` 
 
 ### Statické routery
@@ -69,8 +134,18 @@ Statické routery slouží k spravování servírování statických souborů na
 ```python
 from miniweb import app
     app = app()
-    
+ 
+   
     app.static_router(root="/var/www/", path="/file/")
+    #http://localhost/file/subfolder/index.html
+    # vrati
+    #/var/www/subfolder/index.html
+
+
+    app.static.router(root="/var/user/www/", path="/")
+    #http://localhost/index.html
+    # vrati
+    #/var/user/www/index.html
 ``` 
 
 Na Statické routery se jako u běžných route aplikují globální middleware funkce a popřípadě i middleware funkce daného controlleru. Více v příkladu:
@@ -127,6 +202,17 @@ host=127.0.0.1
 buffer=512
 ``` 
 Úroveň logu je uváděna Stringu a všechna písmena musí být velká.
+
+#### Seznam konfiguračních parametrů
+| Název        | Popis           | Povinný  |
+| ------------- |:-------------:| -----:|
+| port      | Port serveru, na kterém bude naslouchat. | &#x2611; |
+| log      | Úroveň logů frameworku.      |   &#x2611; |
+| host | IP adresa pro server. (Pokud se připojuje k wi-fi přes boot.py, pak zadat "0.0.0.0")      |    &#x2611; |
+| buffer | Velikost pole pro čtení souboru. (Závislé na používaném čipu - 128,256,512, ...)      |    &#x2611; |
+
+*Poznámka: Do budoucna bude framework více robustní, bude přidáno více parametrů.*
+
 
 ### Enumerátory
 Miniweb používá enumerátory pro Log, HTTP metody, Mime typy a HTTP statusy. Je možné uvádět i přesnými hodnotami

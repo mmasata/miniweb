@@ -1,3 +1,19 @@
+# Table of Contents
+* [Basic information](#basic-information)
+* [Third party used libraries](#third-party-used-libraries)
+* [API](#api)
+    * [Route](#route)
+        * [Request](#request)
+        * [Response](#response)
+    * [Static routers](#static-routers)
+    * [Middleware function](#middleware-function)
+    * [Controllers](#controllers)
+    * [Configuration](#configuration)
+        * [List of configuration parameters](#list-of-configuration-parameters)
+    * [Enums](#enums)
+
+
+
 ## Basic information
 Miniweb is a simple web application framework designed for microchips (primary ESP8266 and possibly ESP32) with an emphasis on performance. It was created as a Bachelor's thesis, but will be further developed.
 
@@ -14,18 +30,37 @@ Miniweb is a simple web application framework designed for microchips (primary E
 ### Route
 
 It is defined through the decorator. It contains 4 universal functions and one general - *get()*, *post()*, *put()*, *delete()* and *route()*. For general, it is necessary to define an HTTP method (or more HTTP methods).
+
 The required parameter for all is the path. An optional parameter is the **controller**, which can clusters routes into groups. Another optional parameter is **consumes**, which defines the array of acceptable incoming Content-Type.
 
 ```python
 import miniweb
 
+
 app = miniweb.app()
+
 
 @app.route("/foo", [Method.GET, Method.POST])
 def foo(req, res):
    pass
 
+
 @app.get("/bar")
+def bar(req, res):
+   pass
+
+
+@app.post("/bar")
+def bar(req, res):
+   pass
+
+
+@app.put("/bar")
+def bar(req, res):
+   pass
+
+
+@app.delete("/bar")
 def bar(req, res):
    pass
 ``` 
@@ -40,20 +75,37 @@ def bar(req, res):
 #### Request
 From the request it is possible to access headers, query parameters, or content from the body of the request. The request can process Json and Form Data into an object to make it easy for developers to use. If the miniweb does not know the incoming content-type, the data is only accessible as a String.
 ```python
-    query_parameter_key = request.params["key"]
-    request_content = request.content
+   from miniweb import app
+  
+
+    #/foo?key=1
+    #body: {id: 2, arr: ["a", "b", "c"]}
+    @app.post("/foo"):
+    def foo(request, res):
+
+      query_parameter_key = request.params["key"]
+      request_content = request.content
     
-    #its possible to access through the keys if content is json
-    json_key_id = request.content["id"]
+      #its possible to access through the keys if content is json
+      json_key_id = request.content["id"]
+
     
-    #if content is multipart/form-data, then its accesed via object attributes
-    file = request.content.file
-    value = request.content.value
-    multilinevalue = request.content.multilinevalue
+    #Content-Type: "multipart/form-data"
+    # file: image.jpg
+    # value: 22
+    # multilinevalue: line1
+    #                 line2
+    @app.post("/bar")
+    def bar(request, res):
+
+      #if content is multipart/form-data, then its accesed via object attributes
+      file = request.content.file
+      value = request.content.value
+      multilinevalue = request.content.multilinevalue
     
-    #access to headers
-    headers = request.headers
-    content_type = headers["Content-Type"]
+      #access to headers
+      headers = request.headers
+      content_type = headers["Content-Type"]
 ``` 
 
 #### Response
@@ -61,6 +113,16 @@ For response, it is possible to define the status, content-type and the entity i
 ```python
 from miniweb import Status, Mime
     Response().status(Status.OK).type(Mime.HTML).entity("<h1>Ahoj, světe!</h1>").build()
+
+    @app.get("/foo")
+    def foo(req, res):
+
+       #its possible send dictionary, framework will sent JSON string to client
+       dict = {
+         "key": "value",
+         "arr": [1, 2, 3, 4] 
+       }
+       res.status(Status.OK).type("application/json").entity(dict).build()
 ``` 
 
 ### Static routers
@@ -68,8 +130,18 @@ Static routers are used to manage the serving of static files on the server. Mor
 ```python
 from miniweb import app
     app = app()
+
     
     app.static_router(root="/var/www/", path="/file/")
+    #http://localhost/file/subfolder/index.html
+    # will return
+    #/var/www/subfolder/index.html
+
+
+    app.static.router(root="/var/user/www/", path="/")
+    #http://localhost/index.html
+    # will return
+    #/var/user/www/index.html
 ``` 
 
 As with regular routes, global middleware functions and possibly also middleware functions of the given controller are applied to Static routers. More in the example:
@@ -127,6 +199,18 @@ host=127.0.0.1
 buffer=512
 ``` 
 The log level is specified by the String and all letters must be uppercase.
+
+
+#### List of configuration parameters
+| Name       | Description          | Required  |
+| ------------- |:-------------:| -----:|
+| port      | The port of the server on which it will listen. | &#x2611; |
+| log      | Framework log level.      |   &#x2611; |
+| host | IP address for the server. (If it connects to wi-fi via boot.py, then enter "0.0.0.0")     |    &#x2611; |
+| buffer | The size of the array read file. (Dependent on the chip used - 128,256,512, ...)     |    &#x2611; |
+
+*Note: In the future, the framework will be more robust, more parameters will be added.*
+
 
 ### Enums
 Miniweb uses enumerators for Log, HTTP methods, Mime types and HTTP statuses. It is also possible to state exact values.
