@@ -26,44 +26,40 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from miniweb.utils.enumerators import Log
+<pre><code class="python">from miniweb.tools.enumerators import Log
 from miniweb.exception.exception import *
 import os
 
-def config(params=None):
-    &#39;&#39;&#39;
-    Return the Config object instance.
-    :param params: Dictionary with configuration parameters. (optional parameter)
-    :return: Config object instance.
-    &#39;&#39;&#39;
-    return Config.get_instance(params)
 
 class Config:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Singleton class. Parse configuration parameters from dictionary or configuration file.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     __instance = None
+
 
     @staticmethod
     def get_instance(params=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Static method of Config class. Provides instance and ensure singleton pattern.
         :param params: Dictionary with configuration parameters. (optional parameter)
         :return: Config object instance.
-        &#39;&#39;&#39;
-        if Config.__instance == None:
+        &#34;&#34;&#34;
+        if Config.__instance is None:
             Config(params)
         return Config.__instance
 
+
     def __init__(self, params=None):
-        if Config.__instance != None:
-            raise SingletonExpcetion(&#34;Cannot create new instance of Config class. Its Singleton.&#34;)
+        if Config.__instance is not None:
+            raise SingletonExpcetion(&#34;Cannot create new instance of Config class. Its Singleton!&#34;)
         else:
             Config.__instance = self
-            if params == None:
+            if params is None:
                 self.__get_params_from_config_file()
             else:
                 self.__assign_variables(params)
+
 
     def __get_params_from_config_file(self):
         params = {}
@@ -73,23 +69,25 @@ class Config:
             for row in data_arr:
                 if &#34;=&#34; in row:
                     key, value = row.split(&#34;=&#34;)
-                    params[key] = value if key != &#34;log&#34; else getattr(Log, value)
+                    params[key] = value if key is not &#34;log&#34; else getattr(Log, value)
         except:
             raise FileException(&#34;No config file was found!&#34;)
         self.__assign_variables(params)
 
-    def __find_file(self):
-        list = os.ilistdir()
-        file_name = None
-        for file in list:
-            if file[0].endswith(&#34;.env&#34;):
-                file_name = file[0]
-                break
-        return file_name
 
-    def __assign_variables(self, params):
-        for key in params:
-            setattr(self, key, params[key])</code></pre>
+    def __find_file(self):
+        ld = os.ilistdir()
+        fn = None
+        for f in ld:
+            if f[0].endswith(&#34;.env&#34;):
+                fn = f[0]
+                break
+        return fn
+
+
+    def __assign_variables(self, par):
+        for key in par:
+            setattr(self, key, par[key])</code></pre>
 </details>
 </section>
 <section>
@@ -97,29 +95,6 @@ class Config:
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
-<dl>
-<dt id="miniweb.entity.config.config"><code class="name flex">
-<span>def <span class="ident">config</span></span>(<span>params=None)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Return the Config object instance.
-:param params: Dictionary with configuration parameters. (optional parameter)
-:return: Config object instance.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def config(params=None):
-    &#39;&#39;&#39;
-    Return the Config object instance.
-    :param params: Dictionary with configuration parameters. (optional parameter)
-    :return: Config object instance.
-    &#39;&#39;&#39;
-    return Config.get_instance(params)</code></pre>
-</details>
-</dd>
-</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
@@ -135,31 +110,34 @@ class Config:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Config:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Singleton class. Parse configuration parameters from dictionary or configuration file.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     __instance = None
+
 
     @staticmethod
     def get_instance(params=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Static method of Config class. Provides instance and ensure singleton pattern.
         :param params: Dictionary with configuration parameters. (optional parameter)
         :return: Config object instance.
-        &#39;&#39;&#39;
-        if Config.__instance == None:
+        &#34;&#34;&#34;
+        if Config.__instance is None:
             Config(params)
         return Config.__instance
 
+
     def __init__(self, params=None):
-        if Config.__instance != None:
-            raise SingletonExpcetion(&#34;Cannot create new instance of Config class. Its Singleton.&#34;)
+        if Config.__instance is not None:
+            raise SingletonExpcetion(&#34;Cannot create new instance of Config class. Its Singleton!&#34;)
         else:
             Config.__instance = self
-            if params == None:
+            if params is None:
                 self.__get_params_from_config_file()
             else:
                 self.__assign_variables(params)
+
 
     def __get_params_from_config_file(self):
         params = {}
@@ -169,23 +147,25 @@ class Config:
             for row in data_arr:
                 if &#34;=&#34; in row:
                     key, value = row.split(&#34;=&#34;)
-                    params[key] = value if key != &#34;log&#34; else getattr(Log, value)
+                    params[key] = value if key is not &#34;log&#34; else getattr(Log, value)
         except:
             raise FileException(&#34;No config file was found!&#34;)
         self.__assign_variables(params)
 
-    def __find_file(self):
-        list = os.ilistdir()
-        file_name = None
-        for file in list:
-            if file[0].endswith(&#34;.env&#34;):
-                file_name = file[0]
-                break
-        return file_name
 
-    def __assign_variables(self, params):
-        for key in params:
-            setattr(self, key, params[key])</code></pre>
+    def __find_file(self):
+        ld = os.ilistdir()
+        fn = None
+        for f in ld:
+            if f[0].endswith(&#34;.env&#34;):
+                fn = f[0]
+                break
+        return fn
+
+
+    def __assign_variables(self, par):
+        for key in par:
+            setattr(self, key, par[key])</code></pre>
 </details>
 <h3>Static methods</h3>
 <dl>
@@ -202,12 +182,12 @@ class Config:
 </summary>
 <pre><code class="python">@staticmethod
 def get_instance(params=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Static method of Config class. Provides instance and ensure singleton pattern.
     :param params: Dictionary with configuration parameters. (optional parameter)
     :return: Config object instance.
-    &#39;&#39;&#39;
-    if Config.__instance == None:
+    &#34;&#34;&#34;
+    if Config.__instance is None:
         Config(params)
     return Config.__instance</code></pre>
 </details>
@@ -226,11 +206,6 @@ def get_instance(params=None):
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="miniweb.entity" href="index.html">miniweb.entity</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="miniweb.entity.config.config" href="#miniweb.entity.config.config">config</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

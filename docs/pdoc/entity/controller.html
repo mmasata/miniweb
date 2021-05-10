@@ -29,22 +29,29 @@
 <pre><code class="python">from miniweb.core.miniweb import log
 
 class Controller:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Controller class groups routes.
     Define them prefix in path and define middleware function only for controller routes.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
+
     def __init__(self, path, params=None):
-        log.debug(&#34;Creating new controller: &#34;+path)
+        if path is None:
+            path = &#34;/default/&#34;
+
+        log.debug(&#34;Creating new controller with path: {p}.&#34;.format(p=path))
+
         self.path = path
         self.params = params
         self.filters = []
 
+
     def add_filter(self, fc):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Save reference to middleware function which belongs to Controller.
         :param fc: Function reference.
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         if fc is None:
             log.warning(&#34;Filter function is None!&#34;)
         else:
@@ -72,22 +79,29 @@ Define them prefix in path and define middleware function only for controller ro
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Controller:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Controller class groups routes.
     Define them prefix in path and define middleware function only for controller routes.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
+
     def __init__(self, path, params=None):
-        log.debug(&#34;Creating new controller: &#34;+path)
+        if path is None:
+            path = &#34;/default/&#34;
+
+        log.debug(&#34;Creating new controller with path: {p}.&#34;.format(p=path))
+
         self.path = path
         self.params = params
         self.filters = []
 
+
     def add_filter(self, fc):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Save reference to middleware function which belongs to Controller.
         :param fc: Function reference.
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         if fc is None:
             log.warning(&#34;Filter function is None!&#34;)
         else:
@@ -107,11 +121,11 @@ Define them prefix in path and define middleware function only for controller ro
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def add_filter(self, fc):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Save reference to middleware function which belongs to Controller.
     :param fc: Function reference.
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     if fc is None:
         log.warning(&#34;Filter function is None!&#34;)
     else:

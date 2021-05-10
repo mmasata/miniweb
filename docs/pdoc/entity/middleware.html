@@ -27,76 +27,84 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from miniweb.core.miniweb import log
-from miniweb.utils.enumerators import *
-from miniweb.utils.templates import *
-from miniweb.message.response import *
+from miniweb.tools.templates import *
+
 
 global_filter = []
 
+
 def filter(controller=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     DECORATOR
     Register middleware function to miniweb container.
     :param controller: Group router to group and define path. (optional parameter)
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     def _filter(fc):
-        if controller == None:
+        if controller is None:
             log.debug(&#34;Adding new global middleware function.&#34;)
             global_filter.append(fc)
         else:
-            log.debug(&#34;Adding new controller middleware function for controller: &#34;+controller.path)
+            log.debug(&#34;Adding new controller middleware function for controller with path: {p}&#34;.format(p=controller.path))
             controller.add_filter(fc)
         return fc
     return _filter
 
+
 def validate(controller, req, res):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Validate incoming HTTP request - run middleware function.
     :param controller: Group router to group and define path. (optional parameter)
     :param req: HTTP request wrapped inside of Request class.
     :param res: Response class which will define HTTP response.
     :return: Boolean of success/fail.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     log.info(&#34;Validate middlewares.&#34;)
     if not check_filters_group(global_filter, req, res):
         return False
-    if controller != None:
+
+    if controller is not None:
         if not check_filters_group(controller.filters, req, res):
             return False
+
     log.debug(&#34;Middleware function was suceed.&#34;)
     return True
 
+
 def validate_consumes(mime, req, res):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Validate incoming Content-Type.
     :param mime: Mime type which route can accept.
     :param req: HTTP request wrapped inside of Request class.
     :param res:  Response class which will define HTTP response.
     :return: Boolean of success/fail.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     log.info(&#34;Validate consumes.&#34;)
     if (mime is None) or (req.headers[&#34;Content-Type&#34;] in mime):
         log.debug(&#34;Consumes middleware was suceed.&#34;)
         return True
     else:
         log.warning(&#34;Consumes middleware failed!&#34;)
-        res.type(Mime.HTML).entity(consume_error(req.headers[&#34;Content-Type&#34;])).status(Status.BAD_REQUEST).build()
+        res.type(&#34;text/html&#34;).entity(consume_error(req.headers[&#34;Content-Type&#34;])).status(400).build()
         return False
 
 
-def check_filters_group(filter_arr, req, res):
-    &#39;&#39;&#39;
+def check_filters_group(f_arr, req, res):
+    &#34;&#34;&#34;
     From array with function reference will run this functions.
-    :param filter_arr: Array of filter functions.
+    :param f_arr: Array of filter functions.
     :param req: HTTP request wrapped inside of Request class.
     :param res: Response class which will define HTTP response.
     :return: Boolean of success/fail.
-    &#39;&#39;&#39;
-    for filter in filter_arr:
-        result = filter(req, res)
+    &#34;&#34;&#34;
+
+    for f in f_arr:
+        result = f(req, res)
         if not result:
-            log.warning(&#34;Middleware function failed: &#34;+filter.__name__)
+            log.warning(&#34;Middleware function {fc} failed.&#34;.format(fc=f.__name__))
             return False
     return True</code></pre>
 </details>
@@ -109,11 +117,11 @@ def check_filters_group(filter_arr, req, res):
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="miniweb.entity.middleware.check_filters_group"><code class="name flex">
-<span>def <span class="ident">check_filters_group</span></span>(<span>filter_arr, req, res)</span>
+<span>def <span class="ident">check_filters_group</span></span>(<span>f_arr, req, res)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>From array with function reference will run this functions.
-:param filter_arr: Array of filter functions.
+:param f_arr: Array of filter functions.
 :param req: HTTP request wrapped inside of Request class.
 :param res: Response class which will define HTTP response.
 :return: Boolean of success/fail.</p></div>
@@ -121,18 +129,19 @@ def check_filters_group(filter_arr, req, res):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def check_filters_group(filter_arr, req, res):
-    &#39;&#39;&#39;
+<pre><code class="python">def check_filters_group(f_arr, req, res):
+    &#34;&#34;&#34;
     From array with function reference will run this functions.
-    :param filter_arr: Array of filter functions.
+    :param f_arr: Array of filter functions.
     :param req: HTTP request wrapped inside of Request class.
     :param res: Response class which will define HTTP response.
     :return: Boolean of success/fail.
-    &#39;&#39;&#39;
-    for filter in filter_arr:
-        result = filter(req, res)
+    &#34;&#34;&#34;
+
+    for f in f_arr:
+        result = f(req, res)
         if not result:
-            log.warning(&#34;Middleware function failed: &#34;+filter.__name__)
+            log.warning(&#34;Middleware function {fc} failed.&#34;.format(fc=f.__name__))
             return False
     return True</code></pre>
 </details>
@@ -150,18 +159,19 @@ Register middleware function to miniweb container.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def filter(controller=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     DECORATOR
     Register middleware function to miniweb container.
     :param controller: Group router to group and define path. (optional parameter)
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     def _filter(fc):
-        if controller == None:
+        if controller is None:
             log.debug(&#34;Adding new global middleware function.&#34;)
             global_filter.append(fc)
         else:
-            log.debug(&#34;Adding new controller middleware function for controller: &#34;+controller.path)
+            log.debug(&#34;Adding new controller middleware function for controller with path: {p}&#34;.format(p=controller.path))
             controller.add_filter(fc)
         return fc
     return _filter</code></pre>
@@ -181,19 +191,22 @@ Register middleware function to miniweb container.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def validate(controller, req, res):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Validate incoming HTTP request - run middleware function.
     :param controller: Group router to group and define path. (optional parameter)
     :param req: HTTP request wrapped inside of Request class.
     :param res: Response class which will define HTTP response.
     :return: Boolean of success/fail.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     log.info(&#34;Validate middlewares.&#34;)
     if not check_filters_group(global_filter, req, res):
         return False
-    if controller != None:
+
+    if controller is not None:
         if not check_filters_group(controller.filters, req, res):
             return False
+
     log.debug(&#34;Middleware function was suceed.&#34;)
     return True</code></pre>
 </details>
@@ -213,20 +226,21 @@ Response class which will define HTTP response.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def validate_consumes(mime, req, res):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Validate incoming Content-Type.
     :param mime: Mime type which route can accept.
     :param req: HTTP request wrapped inside of Request class.
     :param res:  Response class which will define HTTP response.
     :return: Boolean of success/fail.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     log.info(&#34;Validate consumes.&#34;)
     if (mime is None) or (req.headers[&#34;Content-Type&#34;] in mime):
         log.debug(&#34;Consumes middleware was suceed.&#34;)
         return True
     else:
         log.warning(&#34;Consumes middleware failed!&#34;)
-        res.type(Mime.HTML).entity(consume_error(req.headers[&#34;Content-Type&#34;])).status(Status.BAD_REQUEST).build()
+        res.type(&#34;text/html&#34;).entity(consume_error(req.headers[&#34;Content-Type&#34;])).status(400).build()
         return False</code></pre>
 </details>
 </dd>

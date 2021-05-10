@@ -31,109 +31,123 @@ log = logging.getLogger(&#34;miniweb&#34;)
 
 
 from miniweb.entity.middleware import validate, validate_consumes
-from miniweb.core.server import server
-from miniweb.utils.enumerators import Method, Status, Mime
-from miniweb.entity.route import Route, Static_route
-from miniweb.message.response import Response
-from miniweb.utils.templates import *
-from miniweb.entity.config import config
+from miniweb.core.server import Server
+from miniweb.entity.route import Route, StaticRoute
+from miniweb.tools.templates import *
+from miniweb.entity.config import Config
 from miniweb.exception.exception import *
 
-def miniweb(params=None):
-    &#39;&#39;&#39;
+
+def app(par=None):
+    &#34;&#34;&#34;
     Return the Miniweb object instance.
-    :param params: Dictionary with configuration parameters. (optional parameter)
+    :param par: Dictionary with configuration parameters. (optional parameter)
     :return: Miniweb object instance.
-    &#39;&#39;&#39;
-    return Miniweb.get_instance(params)
+    &#34;&#34;&#34;
+
+    return Miniweb.get_instance(par)
 
 
 class Miniweb:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Singleton class. It is container for all other framework objects.
-    &#39;&#39;&#39;
-    __instance = None
+    &#34;&#34;&#34;
+
+    __inst = None
+
 
     @staticmethod
-    def get_instance(params=None):
-        &#39;&#39;&#39;
+    def get_instance(par=None):
+        &#34;&#34;&#34;
         Static method of Miniweb class. Provides instance and ensure singleton pattern.
-        :param params: Dictionary with configuration parameters. (optional parameter)
+        :param par: Dictionary with configuration parameters. (optional parameter)
         :return: Miniweb object instance.
-        &#39;&#39;&#39;
-        if Miniweb.__instance == None:
-            Miniweb(params)
-        return Miniweb.__instance
+        &#34;&#34;&#34;
 
-    def __init__(self, params=None):
-        if Miniweb.__instance != None:
-            log.error(&#34;Attempt to create more than one instances of miniweb.&#34;)
-            raise SingletonExpcetion(&#34;Cannot create new instance of Miniweb class. Its Singleton.&#34;)
+        if Miniweb.__inst is None:
+            Miniweb(par)
+        return Miniweb.__inst
+
+
+    def __init__(self, par=None):
+        if Miniweb.__inst is not None:
+            log.error(&#34;Attempt to create more than one instances of miniweb!&#34;)
         else:
-            self.config = config(params)
-            Miniweb.__instance = self
+            Miniweb.__inst = self
+            self.config = Config.get_instance(par)
             self.routes = []
-            self.server = None
-            self.__init_logging()
 
-    def __init_logging(self):
+            self.__enable_log()
+
+
+    def __enable_log(self):
         try:
             log.setLevel(self.config.log)
-            log.info(&#34;Inicialize miniweb&#34;)
+            log.info(&#34;Logging was enabled. Level: {l}&#34;.format(l=self.config.log))
         except:
             raise ConfigParamsException(&#34;Miniweb log level is missing!&#34;)
 
+
     def run(self):
-        &#39;&#39;&#39;
-        Create Server object instance a run it.
+        &#34;&#34;&#34;
+        Create Server object instance and run it.
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         log.debug(&#34;Miniweb send request to initialize Server.&#34;)
-        self.server = server(self)
+        Server.get_instance(self)
+
 
     def static_router(self, root, path, controller=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Register static router to miniweb.
         :param root: Folder path inside of device.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
-        log.info(&#34;Static file server was enabled in root: &#34;+root)
-        self.routes.append(Static_route(root, path, controller))
+        &#34;&#34;&#34;
 
-    def __register_route(self, path, methods, fc):
+        log.info(&#34;Static file server was enabled in root: {r}.&#34;.format(r=root))
+        self.routes.append(StaticRoute(root, path, controller))
+
+
+    def __reg_route(self, path, methods, fc):
+        log.debug(&#34;Constructor of Route class was called.&#34;)
         self.routes.append(Route(path, methods, fc))
 
-    async def handle_response(self, req):
-        &#39;&#39;&#39;
+
+    async def handle_response(self, req, res):
+        &#34;&#34;&#34;
         From request object find route and call route function. Return response.
         :param req: HTTP request wrapped inside of Request class.
         :return: Response object instance.
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         route, params = await self.__find_route(req)
-        res = Response()
-        if route == None:
-            return res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
-        if params != None:
-            route.fc(req, res, params)
+
+        if route is None:
+            res.status(404).type(&#34;text/html&#34;).entity(not_found(req.path, req.method)).build()
         else:
-            route.fc(req, res)
+            if params is None:
+                route.fc(req, res)
+            else:
+                route.fc(req, res, params)
         return res
+
 
     async def __find_route(self, req):
         for route in self.routes:
-            if req.method in route.methods:
-                match, params = route.match_with_vars(req.path)
-                if match:
-                    log.info(&#34;Match with request and route was found.&#34;)
-                    log.debug(&#34;Request match with regex: &#34;+route.regex_str)
-                    return route, params
+            if (req.method in route.methods) and (route.is_match(req.path)):
+                params = route.get_path_params(req.path)
+                log.info(&#34;Match with request and route was found.&#34;)
+                log.debug(&#34;Request match with regex: {re}.&#34;.format(re=route.regex_str))
+                return route, params
         log.info(&#34;Route for request was not found.&#34;)
         return None, None
 
+
     def route(self, path, methods, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. General class method.
         :param path: Path for route.
@@ -141,69 +155,84 @@ class Miniweb:
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
-        log.debug(&#34;Route decorator accept function for path: &#34;+path)
+        &#34;&#34;&#34;
+
         def _route(fc):
             def wrapper(*args, **kwargs):
                 result = None
                 if (validate_consumes(consumes, args[0], args[1])) and (validate(controller, args[0], args[1])):
                     result = fc(*args, **kwargs)
                 return result
-            fullPath = controller.path+path if controller != None else path
-            self.__register_route(fullPath, methods, wrapper)
+
+            if methods is not None and path is not None:
+                log.debug(&#34;Route decorator accept function for path: p.&#34;.format(p=path))
+
+                full_path = controller.path+path if controller is not None else path
+                self.__reg_route(full_path, methods, wrapper)
+            else:
+                log.warning(&#34;Route path or method is None!&#34;)
+
             return wrapper
         return _route
 
+
     def get(self, path, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. Predefined class method with HTTP method - GET.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         def _inner(fc):
-            return self.route(path, [Method.GET], controller, consumes)(fc)
+            return self.route(path, [&#34;GET&#34;], controller, consumes)(fc)
         return _inner
 
+
     def post(self, path, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. Predefined class method with HTTP method - POST.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         def _inner(fc):
-            return self.route(path, [Method.POST], controller, consumes)(fc)
+            return self.route(path, [&#34;POST&#34;], controller, consumes)(fc)
         return _inner
 
+
     def put(self, path, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. Predefined class method with HTTP method - PUT.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         def _inner(fc):
-            return self.route(path, [Method.PUT], controller, consumes)(fc)
+            return self.route(path, [&#34;PUT&#34;], controller, consumes)(fc)
         return _inner
 
+
     def delete(self, path, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. Predefined class method with HTTP method - DELETE.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         def _inner(fc):
-            return self.route(path, [Method.DELETE], controller, consumes)(fc)
+            return self.route(path, [&#34;DELETE&#34;], controller, consumes)(fc)
         return _inner</code></pre>
 </details>
 </section>
@@ -214,24 +243,25 @@ class Miniweb:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="miniweb.core.miniweb.miniweb"><code class="name flex">
-<span>def <span class="ident">miniweb</span></span>(<span>params=None)</span>
+<dt id="miniweb.core.miniweb.app"><code class="name flex">
+<span>def <span class="ident">app</span></span>(<span>par=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Return the Miniweb object instance.
-:param params: Dictionary with configuration parameters. (optional parameter)
+:param par: Dictionary with configuration parameters. (optional parameter)
 :return: Miniweb object instance.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def miniweb(params=None):
-    &#39;&#39;&#39;
+<pre><code class="python">def app(par=None):
+    &#34;&#34;&#34;
     Return the Miniweb object instance.
-    :param params: Dictionary with configuration parameters. (optional parameter)
+    :param par: Dictionary with configuration parameters. (optional parameter)
     :return: Miniweb object instance.
-    &#39;&#39;&#39;
-    return Miniweb.get_instance(params)</code></pre>
+    &#34;&#34;&#34;
+
+    return Miniweb.get_instance(par)</code></pre>
 </details>
 </dd>
 </dl>
@@ -241,7 +271,7 @@ class Miniweb:
 <dl>
 <dt id="miniweb.core.miniweb.Miniweb"><code class="flex name class">
 <span>class <span class="ident">Miniweb</span></span>
-<span>(</span><span>params=None)</span>
+<span>(</span><span>par=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Singleton class. It is container for all other framework objects.</p></div>
@@ -250,91 +280,105 @@ class Miniweb:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Miniweb:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Singleton class. It is container for all other framework objects.
-    &#39;&#39;&#39;
-    __instance = None
+    &#34;&#34;&#34;
+
+    __inst = None
+
 
     @staticmethod
-    def get_instance(params=None):
-        &#39;&#39;&#39;
+    def get_instance(par=None):
+        &#34;&#34;&#34;
         Static method of Miniweb class. Provides instance and ensure singleton pattern.
-        :param params: Dictionary with configuration parameters. (optional parameter)
+        :param par: Dictionary with configuration parameters. (optional parameter)
         :return: Miniweb object instance.
-        &#39;&#39;&#39;
-        if Miniweb.__instance == None:
-            Miniweb(params)
-        return Miniweb.__instance
+        &#34;&#34;&#34;
 
-    def __init__(self, params=None):
-        if Miniweb.__instance != None:
-            log.error(&#34;Attempt to create more than one instances of miniweb.&#34;)
-            raise SingletonExpcetion(&#34;Cannot create new instance of Miniweb class. Its Singleton.&#34;)
+        if Miniweb.__inst is None:
+            Miniweb(par)
+        return Miniweb.__inst
+
+
+    def __init__(self, par=None):
+        if Miniweb.__inst is not None:
+            log.error(&#34;Attempt to create more than one instances of miniweb!&#34;)
         else:
-            self.config = config(params)
-            Miniweb.__instance = self
+            Miniweb.__inst = self
+            self.config = Config.get_instance(par)
             self.routes = []
-            self.server = None
-            self.__init_logging()
 
-    def __init_logging(self):
+            self.__enable_log()
+
+
+    def __enable_log(self):
         try:
             log.setLevel(self.config.log)
-            log.info(&#34;Inicialize miniweb&#34;)
+            log.info(&#34;Logging was enabled. Level: {l}&#34;.format(l=self.config.log))
         except:
             raise ConfigParamsException(&#34;Miniweb log level is missing!&#34;)
 
+
     def run(self):
-        &#39;&#39;&#39;
-        Create Server object instance a run it.
+        &#34;&#34;&#34;
+        Create Server object instance and run it.
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         log.debug(&#34;Miniweb send request to initialize Server.&#34;)
-        self.server = server(self)
+        Server.get_instance(self)
+
 
     def static_router(self, root, path, controller=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Register static router to miniweb.
         :param root: Folder path inside of device.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
-        log.info(&#34;Static file server was enabled in root: &#34;+root)
-        self.routes.append(Static_route(root, path, controller))
+        &#34;&#34;&#34;
 
-    def __register_route(self, path, methods, fc):
+        log.info(&#34;Static file server was enabled in root: {r}.&#34;.format(r=root))
+        self.routes.append(StaticRoute(root, path, controller))
+
+
+    def __reg_route(self, path, methods, fc):
+        log.debug(&#34;Constructor of Route class was called.&#34;)
         self.routes.append(Route(path, methods, fc))
 
-    async def handle_response(self, req):
-        &#39;&#39;&#39;
+
+    async def handle_response(self, req, res):
+        &#34;&#34;&#34;
         From request object find route and call route function. Return response.
         :param req: HTTP request wrapped inside of Request class.
         :return: Response object instance.
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         route, params = await self.__find_route(req)
-        res = Response()
-        if route == None:
-            return res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
-        if params != None:
-            route.fc(req, res, params)
+
+        if route is None:
+            res.status(404).type(&#34;text/html&#34;).entity(not_found(req.path, req.method)).build()
         else:
-            route.fc(req, res)
+            if params is None:
+                route.fc(req, res)
+            else:
+                route.fc(req, res, params)
         return res
+
 
     async def __find_route(self, req):
         for route in self.routes:
-            if req.method in route.methods:
-                match, params = route.match_with_vars(req.path)
-                if match:
-                    log.info(&#34;Match with request and route was found.&#34;)
-                    log.debug(&#34;Request match with regex: &#34;+route.regex_str)
-                    return route, params
+            if (req.method in route.methods) and (route.is_match(req.path)):
+                params = route.get_path_params(req.path)
+                log.info(&#34;Match with request and route was found.&#34;)
+                log.debug(&#34;Request match with regex: {re}.&#34;.format(re=route.regex_str))
+                return route, params
         log.info(&#34;Route for request was not found.&#34;)
         return None, None
 
+
     def route(self, path, methods, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. General class method.
         :param path: Path for route.
@@ -342,94 +386,110 @@ class Miniweb:
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
-        log.debug(&#34;Route decorator accept function for path: &#34;+path)
+        &#34;&#34;&#34;
+
         def _route(fc):
             def wrapper(*args, **kwargs):
                 result = None
                 if (validate_consumes(consumes, args[0], args[1])) and (validate(controller, args[0], args[1])):
                     result = fc(*args, **kwargs)
                 return result
-            fullPath = controller.path+path if controller != None else path
-            self.__register_route(fullPath, methods, wrapper)
+
+            if methods is not None and path is not None:
+                log.debug(&#34;Route decorator accept function for path: p.&#34;.format(p=path))
+
+                full_path = controller.path+path if controller is not None else path
+                self.__reg_route(full_path, methods, wrapper)
+            else:
+                log.warning(&#34;Route path or method is None!&#34;)
+
             return wrapper
         return _route
 
+
     def get(self, path, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. Predefined class method with HTTP method - GET.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         def _inner(fc):
-            return self.route(path, [Method.GET], controller, consumes)(fc)
+            return self.route(path, [&#34;GET&#34;], controller, consumes)(fc)
         return _inner
 
+
     def post(self, path, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. Predefined class method with HTTP method - POST.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         def _inner(fc):
-            return self.route(path, [Method.POST], controller, consumes)(fc)
+            return self.route(path, [&#34;POST&#34;], controller, consumes)(fc)
         return _inner
 
+
     def put(self, path, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. Predefined class method with HTTP method - PUT.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         def _inner(fc):
-            return self.route(path, [Method.PUT], controller, consumes)(fc)
+            return self.route(path, [&#34;PUT&#34;], controller, consumes)(fc)
         return _inner
 
+
     def delete(self, path, controller=None, consumes=None):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         DECORATOR
         Register route to miniweb. Predefined class method with HTTP method - DELETE.
         :param path: Path for route.
         :param controller: Group router to group and define path. (optional parameter)
         :param consumes: Validation for incoming Content-Type. (optional parameter)
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         def _inner(fc):
-            return self.route(path, [Method.DELETE], controller, consumes)(fc)
+            return self.route(path, [&#34;DELETE&#34;], controller, consumes)(fc)
         return _inner</code></pre>
 </details>
 <h3>Static methods</h3>
 <dl>
 <dt id="miniweb.core.miniweb.Miniweb.get_instance"><code class="name flex">
-<span>def <span class="ident">get_instance</span></span>(<span>params=None)</span>
+<span>def <span class="ident">get_instance</span></span>(<span>par=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Static method of Miniweb class. Provides instance and ensure singleton pattern.
-:param params: Dictionary with configuration parameters. (optional parameter)
+:param par: Dictionary with configuration parameters. (optional parameter)
 :return: Miniweb object instance.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@staticmethod
-def get_instance(params=None):
-    &#39;&#39;&#39;
+def get_instance(par=None):
+    &#34;&#34;&#34;
     Static method of Miniweb class. Provides instance and ensure singleton pattern.
-    :param params: Dictionary with configuration parameters. (optional parameter)
+    :param par: Dictionary with configuration parameters. (optional parameter)
     :return: Miniweb object instance.
-    &#39;&#39;&#39;
-    if Miniweb.__instance == None:
-        Miniweb(params)
-    return Miniweb.__instance</code></pre>
+    &#34;&#34;&#34;
+
+    if Miniweb.__inst is None:
+        Miniweb(par)
+    return Miniweb.__inst</code></pre>
 </details>
 </dd>
 </dl>
@@ -450,16 +510,17 @@ Register route to miniweb. Predefined class method with HTTP method - DELETE.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def delete(self, path, controller=None, consumes=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     DECORATOR
     Register route to miniweb. Predefined class method with HTTP method - DELETE.
     :param path: Path for route.
     :param controller: Group router to group and define path. (optional parameter)
     :param consumes: Validation for incoming Content-Type. (optional parameter)
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     def _inner(fc):
-        return self.route(path, [Method.DELETE], controller, consumes)(fc)
+        return self.route(path, [&#34;DELETE&#34;], controller, consumes)(fc)
     return _inner</code></pre>
 </details>
 </dd>
@@ -478,21 +539,22 @@ Register route to miniweb. Predefined class method with HTTP method - GET.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get(self, path, controller=None, consumes=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     DECORATOR
     Register route to miniweb. Predefined class method with HTTP method - GET.
     :param path: Path for route.
     :param controller: Group router to group and define path. (optional parameter)
     :param consumes: Validation for incoming Content-Type. (optional parameter)
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     def _inner(fc):
-        return self.route(path, [Method.GET], controller, consumes)(fc)
+        return self.route(path, [&#34;GET&#34;], controller, consumes)(fc)
     return _inner</code></pre>
 </details>
 </dd>
 <dt id="miniweb.core.miniweb.Miniweb.handle_response"><code class="name flex">
-<span>async def <span class="ident">handle_response</span></span>(<span>self, req)</span>
+<span>async def <span class="ident">handle_response</span></span>(<span>self, req, res)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>From request object find route and call route function. Return response.
@@ -502,20 +564,22 @@ Register route to miniweb. Predefined class method with HTTP method - GET.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def handle_response(self, req):
-    &#39;&#39;&#39;
+<pre><code class="python">async def handle_response(self, req, res):
+    &#34;&#34;&#34;
     From request object find route and call route function. Return response.
     :param req: HTTP request wrapped inside of Request class.
     :return: Response object instance.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     route, params = await self.__find_route(req)
-    res = Response()
-    if route == None:
-        return res.status(Status.NOT_FOUND).type(Mime.HTML).entity(not_found(req.path, req.method)).build()
-    if params != None:
-        route.fc(req, res, params)
+
+    if route is None:
+        res.status(404).type(&#34;text/html&#34;).entity(not_found(req.path, req.method)).build()
     else:
-        route.fc(req, res)
+        if params is None:
+            route.fc(req, res)
+        else:
+            route.fc(req, res, params)
     return res</code></pre>
 </details>
 </dd>
@@ -534,16 +598,17 @@ Register route to miniweb. Predefined class method with HTTP method - POST.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def post(self, path, controller=None, consumes=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     DECORATOR
     Register route to miniweb. Predefined class method with HTTP method - POST.
     :param path: Path for route.
     :param controller: Group router to group and define path. (optional parameter)
     :param consumes: Validation for incoming Content-Type. (optional parameter)
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     def _inner(fc):
-        return self.route(path, [Method.POST], controller, consumes)(fc)
+        return self.route(path, [&#34;POST&#34;], controller, consumes)(fc)
     return _inner</code></pre>
 </details>
 </dd>
@@ -562,16 +627,17 @@ Register route to miniweb. Predefined class method with HTTP method - PUT.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def put(self, path, controller=None, consumes=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     DECORATOR
     Register route to miniweb. Predefined class method with HTTP method - PUT.
     :param path: Path for route.
     :param controller: Group router to group and define path. (optional parameter)
     :param consumes: Validation for incoming Content-Type. (optional parameter)
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     def _inner(fc):
-        return self.route(path, [Method.PUT], controller, consumes)(fc)
+        return self.route(path, [&#34;PUT&#34;], controller, consumes)(fc)
     return _inner</code></pre>
 </details>
 </dd>
@@ -591,7 +657,7 @@ Register route to miniweb. General class method.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def route(self, path, methods, controller=None, consumes=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     DECORATOR
     Register route to miniweb. General class method.
     :param path: Path for route.
@@ -599,16 +665,23 @@ Register route to miniweb. General class method.
     :param controller: Group router to group and define path. (optional parameter)
     :param consumes: Validation for incoming Content-Type. (optional parameter)
     :return: None
-    &#39;&#39;&#39;
-    log.debug(&#34;Route decorator accept function for path: &#34;+path)
+    &#34;&#34;&#34;
+
     def _route(fc):
         def wrapper(*args, **kwargs):
             result = None
             if (validate_consumes(consumes, args[0], args[1])) and (validate(controller, args[0], args[1])):
                 result = fc(*args, **kwargs)
             return result
-        fullPath = controller.path+path if controller != None else path
-        self.__register_route(fullPath, methods, wrapper)
+
+        if methods is not None and path is not None:
+            log.debug(&#34;Route decorator accept function for path: p.&#34;.format(p=path))
+
+            full_path = controller.path+path if controller is not None else path
+            self.__reg_route(full_path, methods, wrapper)
+        else:
+            log.warning(&#34;Route path or method is None!&#34;)
+
         return wrapper
     return _route</code></pre>
 </details>
@@ -617,19 +690,20 @@ Register route to miniweb. General class method.
 <span>def <span class="ident">run</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create Server object instance a run it.
+<div class="desc"><p>Create Server object instance and run it.
 :return: None</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def run(self):
-    &#39;&#39;&#39;
-    Create Server object instance a run it.
+    &#34;&#34;&#34;
+    Create Server object instance and run it.
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     log.debug(&#34;Miniweb send request to initialize Server.&#34;)
-    self.server = server(self)</code></pre>
+    Server.get_instance(self)</code></pre>
 </details>
 </dd>
 <dt id="miniweb.core.miniweb.Miniweb.static_router"><code class="name flex">
@@ -646,15 +720,16 @@ Register route to miniweb. General class method.
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def static_router(self, root, path, controller=None):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Register static router to miniweb.
     :param root: Folder path inside of device.
     :param path: Path for route.
     :param controller: Group router to group and define path. (optional parameter)
     :return: None
-    &#39;&#39;&#39;
-    log.info(&#34;Static file server was enabled in root: &#34;+root)
-    self.routes.append(Static_route(root, path, controller))</code></pre>
+    &#34;&#34;&#34;
+
+    log.info(&#34;Static file server was enabled in root: {r}.&#34;.format(r=root))
+    self.routes.append(StaticRoute(root, path, controller))</code></pre>
 </details>
 </dd>
 </dl>
@@ -675,7 +750,7 @@ Register route to miniweb. General class method.
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="miniweb.core.miniweb.miniweb" href="#miniweb.core.miniweb.miniweb">miniweb</a></code></li>
+<li><code><a title="miniweb.core.miniweb.app" href="#miniweb.core.miniweb.app">app</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>

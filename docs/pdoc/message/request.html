@@ -28,66 +28,78 @@
 </summary>
 <pre><code class="python">from miniweb.core.miniweb import log
 from miniweb.exception.exception import *
-from .content import *
+from .content import get_content
 
 class Request:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Class for HTTP request which store parameters in class attributes.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self):
         self.headers = {}
         self.close = False
         self.content_read = False
+        self.has_path = False
 
-    async def parse_header(self, data, first=False):
-        &#39;&#39;&#39;
+
+    async def parse_header(self, data):
+        &#34;&#34;&#34;
         Accept HTTP request header in raw and parse them and store to attribute.
         :param data: Incoming header row.
-        :param first: Boolean if its first incoming row.
         :return: Boolean if we can continue read headers.
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         try:
-            if first:
+            if not self.has_path:
                 self.method, full_path, proto = data.split()
-                log.info(&#34;Incoming request &#34;+self.method+&#34; &#34;+full_path)
+                log.info(&#34;Incoming HTTP request {m} {p}.&#34;.format(m=self.method, p=full_path))
+
                 await self.__find_query_params(full_path)
+                self.has_path = True
             else:
                 header, value = data.split(&#34;: &#34;)
                 self.headers[header] = value.replace(&#34;\r\n&#34;, &#34;&#34;)
-                log.debug(&#34;Header &#34;+header+&#34;: &#34;+self.headers[header])
+                log.debug(&#34;Header\n {k}: {v}&#34;.format(k=header, v=self.headers[header]))
+
                 if &#34;Content-Length&#34; == header:
                     self.headers[&#34;Content-Type&#34;] = self.headers[&#34;Content-Type&#34;].split(&#34;;&#34;)[0]
                     self.content_len = int(value)
                     self.content_read = self.content_len &gt; 0
                     return False
+
             return True
         except HeaderException:
             log.error(&#34;Error during read of request headers!&#34;)
 
 
     async def parse_content(self, data):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Accept Content-Data and parse them to object. Object is stored to Request class.
         :param data: Incoming Content-Data
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         log.debug(&#34;Content data: \r\n&#34;+data)
         try:
             self.content = get_content(data, self.headers[&#34;Content-Type&#34;])
         except ContentTypeException:
             log.error(&#34;Error in parsing Content-Type!&#34;)
 
+
     async def __find_query_params(self, full_path):
         if &#34;?&#34; in full_path:
             log.debug(&#34;Parsing query params.&#34;)
-            self.path, q_par_str = full_path.split(&#34;?&#34;, 1)
-            q_par_arr = q_par_str.split(&#34;&amp;&#34;)
+
             self.params = {}
+            self.path, q_par_str = full_path.split(&#34;?&#34;, 1)
+
+            q_par_arr = q_par_str.split(&#34;&amp;&#34;)
             for par in q_par_arr:
                 key, value = par.split(&#34;=&#34;)
-                log.debug(&#34;Query param &#34;+key+&#34;: &#34;+value)
                 self.params[key] = value
+
+                log.debug(&#34;Query param\n {k}: {v}&#34;.format(k=key, v=value))
         else:
             self.path = full_path</code></pre>
 </details>
@@ -111,63 +123,75 @@ class Request:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Request:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Class for HTTP request which store parameters in class attributes.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self):
         self.headers = {}
         self.close = False
         self.content_read = False
+        self.has_path = False
 
-    async def parse_header(self, data, first=False):
-        &#39;&#39;&#39;
+
+    async def parse_header(self, data):
+        &#34;&#34;&#34;
         Accept HTTP request header in raw and parse them and store to attribute.
         :param data: Incoming header row.
-        :param first: Boolean if its first incoming row.
         :return: Boolean if we can continue read headers.
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         try:
-            if first:
+            if not self.has_path:
                 self.method, full_path, proto = data.split()
-                log.info(&#34;Incoming request &#34;+self.method+&#34; &#34;+full_path)
+                log.info(&#34;Incoming HTTP request {m} {p}.&#34;.format(m=self.method, p=full_path))
+
                 await self.__find_query_params(full_path)
+                self.has_path = True
             else:
                 header, value = data.split(&#34;: &#34;)
                 self.headers[header] = value.replace(&#34;\r\n&#34;, &#34;&#34;)
-                log.debug(&#34;Header &#34;+header+&#34;: &#34;+self.headers[header])
+                log.debug(&#34;Header\n {k}: {v}&#34;.format(k=header, v=self.headers[header]))
+
                 if &#34;Content-Length&#34; == header:
                     self.headers[&#34;Content-Type&#34;] = self.headers[&#34;Content-Type&#34;].split(&#34;;&#34;)[0]
                     self.content_len = int(value)
                     self.content_read = self.content_len &gt; 0
                     return False
+
             return True
         except HeaderException:
             log.error(&#34;Error during read of request headers!&#34;)
 
 
     async def parse_content(self, data):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Accept Content-Data and parse them to object. Object is stored to Request class.
         :param data: Incoming Content-Data
         :return: None
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         log.debug(&#34;Content data: \r\n&#34;+data)
         try:
             self.content = get_content(data, self.headers[&#34;Content-Type&#34;])
         except ContentTypeException:
             log.error(&#34;Error in parsing Content-Type!&#34;)
 
+
     async def __find_query_params(self, full_path):
         if &#34;?&#34; in full_path:
             log.debug(&#34;Parsing query params.&#34;)
-            self.path, q_par_str = full_path.split(&#34;?&#34;, 1)
-            q_par_arr = q_par_str.split(&#34;&amp;&#34;)
+
             self.params = {}
+            self.path, q_par_str = full_path.split(&#34;?&#34;, 1)
+
+            q_par_arr = q_par_str.split(&#34;&amp;&#34;)
             for par in q_par_arr:
                 key, value = par.split(&#34;=&#34;)
-                log.debug(&#34;Query param &#34;+key+&#34;: &#34;+value)
                 self.params[key] = value
+
+                log.debug(&#34;Query param\n {k}: {v}&#34;.format(k=key, v=value))
         else:
             self.path = full_path</code></pre>
 </details>
@@ -185,11 +209,12 @@ class Request:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">async def parse_content(self, data):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Accept Content-Data and parse them to object. Object is stored to Request class.
     :param data: Incoming Content-Data
     :return: None
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     log.debug(&#34;Content data: \r\n&#34;+data)
     try:
         self.content = get_content(data, self.headers[&#34;Content-Type&#34;])
@@ -198,38 +223,41 @@ class Request:
 </details>
 </dd>
 <dt id="miniweb.message.request.Request.parse_header"><code class="name flex">
-<span>async def <span class="ident">parse_header</span></span>(<span>self, data, first=False)</span>
+<span>async def <span class="ident">parse_header</span></span>(<span>self, data)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Accept HTTP request header in raw and parse them and store to attribute.
 :param data: Incoming header row.
-:param first: Boolean if its first incoming row.
 :return: Boolean if we can continue read headers.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">async def parse_header(self, data, first=False):
-    &#39;&#39;&#39;
+<pre><code class="python">async def parse_header(self, data):
+    &#34;&#34;&#34;
     Accept HTTP request header in raw and parse them and store to attribute.
     :param data: Incoming header row.
-    :param first: Boolean if its first incoming row.
     :return: Boolean if we can continue read headers.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     try:
-        if first:
+        if not self.has_path:
             self.method, full_path, proto = data.split()
-            log.info(&#34;Incoming request &#34;+self.method+&#34; &#34;+full_path)
+            log.info(&#34;Incoming HTTP request {m} {p}.&#34;.format(m=self.method, p=full_path))
+
             await self.__find_query_params(full_path)
+            self.has_path = True
         else:
             header, value = data.split(&#34;: &#34;)
             self.headers[header] = value.replace(&#34;\r\n&#34;, &#34;&#34;)
-            log.debug(&#34;Header &#34;+header+&#34;: &#34;+self.headers[header])
+            log.debug(&#34;Header\n {k}: {v}&#34;.format(k=header, v=self.headers[header]))
+
             if &#34;Content-Length&#34; == header:
                 self.headers[&#34;Content-Type&#34;] = self.headers[&#34;Content-Type&#34;].split(&#34;;&#34;)[0]
                 self.content_len = int(value)
                 self.content_read = self.content_len &gt; 0
                 return False
+
         return True
     except HeaderException:
         log.error(&#34;Error during read of request headers!&#34;)</code></pre>

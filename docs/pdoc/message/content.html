@@ -27,41 +27,47 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from miniweb.core.miniweb import log
-from miniweb.utils.enumerators import Mime
 #import ujson
 
-def get_content(data, type):
-    &#39;&#39;&#39;
+
+def get_content(data, t):
+    &#34;&#34;&#34;
     Parse incoming Content-Type to object.
     :param data: Raw Content-Data from HTTP request.
-    :param type: Content-Type of HTTP request Content-Data.
+    :param t: Content-Type of HTTP request Content-Data.
     :return: Data parsed to object.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     result = data
-    if type == Mime.JSON:
+    if t == &#34;application/json&#34;:
         log.info(&#34;Parsing JSON string to object.&#34;)
         result = ujson.loads(data)
-    elif type == Mime.FormData:
+    elif t == &#34;multipart/form-data&#34;:
         result = FormData(data)
     else:
         log.warning(&#34;Unknown content type! Content will be accessable in raw format.&#34;)
     return result
 
+
 class Content():
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Abstract class for Contents types.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self, data):
         self.__parse_data(data)
 
+
     def __parse_data(self, data):
         pass
 
+
 class FormData(Content):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Child of abstract class Content. This class wrapped form data and store them to class attributes.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __parse_data(self, data):
         log.info(&#34;Parsing FormData.&#34;)
@@ -85,46 +91,53 @@ class FormData(Content):
             elif current_key is not None:
                 if current_is_file:
                     current_value = self.__create_file(filename, current_value)
+
+                log.debug(&#34;Set form data attribute with key: {k}.&#34;.format(k=current_key))
                 setattr(self, current_key, current_value)
                 read_values = False
                 current_key = None
                 current_value = &#34;&#34;
                 filename = None
 
+
     def __create_file(self, filename, data):
-        file_and_type = filename.split(&#34;.&#34;)
-        return File(file_and_type[0], file_and_type[1], data)
+        file_and_type = filename.replace(&#39;&#34;&#39;, &#34;&#34;).split(&#34;.&#34;)
+        return File(file_and_type[0].split(&#34;=&#34;)[1], file_and_type[1], data)
 
 
 class File:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Class for storing file with his data, name, type.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self, name, type, data):
         self.name = name
         self.type = type
         self.data = data
 
+
     def get_data(self):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Getter for data.
         :return: File data
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         return self.data
 
+
     def get_type(self):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Getter for type.
         :return: File type
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         return self.type
 
+
     def get_name(self):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Getter for name.
         :return: File name
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         return self.name</code></pre>
 </details>
 </section>
@@ -136,29 +149,30 @@ class File:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="miniweb.message.content.get_content"><code class="name flex">
-<span>def <span class="ident">get_content</span></span>(<span>data, type)</span>
+<span>def <span class="ident">get_content</span></span>(<span>data, t)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Parse incoming Content-Type to object.
 :param data: Raw Content-Data from HTTP request.
-:param type: Content-Type of HTTP request Content-Data.
+:param t: Content-Type of HTTP request Content-Data.
 :return: Data parsed to object.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_content(data, type):
-    &#39;&#39;&#39;
+<pre><code class="python">def get_content(data, t):
+    &#34;&#34;&#34;
     Parse incoming Content-Type to object.
     :param data: Raw Content-Data from HTTP request.
-    :param type: Content-Type of HTTP request Content-Data.
+    :param t: Content-Type of HTTP request Content-Data.
     :return: Data parsed to object.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     result = data
-    if type == Mime.JSON:
+    if t == &#34;application/json&#34;:
         log.info(&#34;Parsing JSON string to object.&#34;)
         result = ujson.loads(data)
-    elif type == Mime.FormData:
+    elif t == &#34;multipart/form-data&#34;:
         result = FormData(data)
     else:
         log.warning(&#34;Unknown content type! Content will be accessable in raw format.&#34;)
@@ -181,12 +195,14 @@ class File:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Content():
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Abstract class for Contents types.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self, data):
         self.__parse_data(data)
+
 
     def __parse_data(self, data):
         pass</code></pre>
@@ -207,34 +223,38 @@ class File:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class File:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Class for storing file with his data, name, type.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self, name, type, data):
         self.name = name
         self.type = type
         self.data = data
 
+
     def get_data(self):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Getter for data.
         :return: File data
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         return self.data
 
+
     def get_type(self):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Getter for type.
         :return: File type
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         return self.type
 
+
     def get_name(self):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Getter for name.
         :return: File name
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         return self.name</code></pre>
 </details>
 <h3>Methods</h3>
@@ -250,10 +270,10 @@ class File:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_data(self):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Getter for data.
     :return: File data
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     return self.data</code></pre>
 </details>
 </dd>
@@ -268,10 +288,10 @@ class File:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_name(self):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Getter for name.
     :return: File name
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     return self.name</code></pre>
 </details>
 </dd>
@@ -286,10 +306,10 @@ class File:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_type(self):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Getter for type.
     :return: File type
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     return self.type</code></pre>
 </details>
 </dd>
@@ -306,9 +326,10 @@ class File:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class FormData(Content):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Child of abstract class Content. This class wrapped form data and store them to class attributes.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __parse_data(self, data):
         log.info(&#34;Parsing FormData.&#34;)
@@ -332,15 +353,18 @@ class File:
             elif current_key is not None:
                 if current_is_file:
                     current_value = self.__create_file(filename, current_value)
+
+                log.debug(&#34;Set form data attribute with key: {k}.&#34;.format(k=current_key))
                 setattr(self, current_key, current_value)
                 read_values = False
                 current_key = None
                 current_value = &#34;&#34;
                 filename = None
 
+
     def __create_file(self, filename, data):
-        file_and_type = filename.split(&#34;.&#34;)
-        return File(file_and_type[0], file_and_type[1], data)</code></pre>
+        file_and_type = filename.replace(&#39;&#34;&#39;, &#34;&#34;).split(&#34;.&#34;)
+        return File(file_and_type[0].split(&#34;=&#34;)[1], file_and_type[1], data)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">

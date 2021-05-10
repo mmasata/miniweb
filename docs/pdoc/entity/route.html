@@ -29,34 +29,41 @@
 <pre><code class="python">#import ure
 from miniweb.core.miniweb import log
 from miniweb.exception.exception import *
-from miniweb.utils.enumerators import get_mime_by_suffix, Status, Mime
-from miniweb.utils.templates import *
+from miniweb.tools.enumerators import get_mime_by_suffix, Status, Mime
+from miniweb.tools.templates import *
 from miniweb.entity.middleware import validate
 
 class Route:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Route class. Contains path, HTTP methods and reference for route function.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
+
     def __init__(self, path, methods, fc):
-        log.info(&#34;Register route for methods: [&#34;+&#39;, &#39;.join(methods)+&#34;] and path:&#34;+path)
+        log.info(&#34;Register route for method/s: {m} and path: {p}.&#34;.format(m=methods, p=path))
+
+        self.path = path
         self.regex, self.param_keys = self.__compile_regex(path)
         self.methods = methods
         self.fc = fc
 
+
     def __compile_regex(self, url):
         try:
             log.debug(&#34;Compile url to regex.&#34;)
+
             self.num_slashes = []
             slash = 0
             params = []
             current_param = &#34;&#34;
             param_reading = False
             self.regex_str = &#34;^&#34;
+
             for char in url:
-                if char == &#34;{&#34;:
+                if char is &#34;{&#34;:
                     self.num_slashes.append(slash)
                     param_reading = True
-                elif char == &#34;}&#34;:
+                elif char is &#34;}&#34;:
                     param_reading = False
                     params.append(current_param)
                     self.regex_str += &#34;\w+&#34;
@@ -65,65 +72,85 @@ class Route:
                     current_param += char
                 else:
                     self.regex_str += char
-                    slash = slash+1 if char == &#34;/&#34; else slash
+                    slash = slash+1 if char is &#34;/&#34; else slash
+
             self.regex_str += &#34;$&#34;
             return ure.compile(self.regex_str), params
         except:
             raise CompileRegexException(&#34;Error with compiling regex in route class!&#34;)
 
-    def match_with_vars(self, path):
-        &#39;&#39;&#39;
-        Accept current path from HTTP request and looking for match with current route.
-        If found try also found path parameters.
-        :param path: Incoming path from HTTP request.
-        :return: Boolean of match; path parameters in dictionary
-        &#39;&#39;&#39;
-        match = ure.match(self.regex, path) != None
-        params = None
-        if match:
-            if len(self.param_keys) &gt; 0:
-                params = self.__find_vars(path)
-        return match, params
 
-    def __find_vars(self, path):
-        log.debug(&#34;Getting variables from path.&#34;)
-        params = {}
-        split_path = path.split(&#34;/&#34;)
-        slash_arr_size = len(self.num_slashes)
-        for i in range(0, slash_arr_size):
-            params[self.param_keys[i]] = split_path[self.num_slashes[i]]
+    def is_match(self, path):
+        &#34;&#34;&#34;
+        Accept current path from HTTP request and looking for match with current route.
+        :param path: Incoming path from HTTP request.
+        :return: Boolean of match
+        &#34;&#34;&#34;
+        log.debug(&#34;Looking for route match.\n Path: {p}\n Regex: {r}&#34;.format(p=path, r=self.regex_str))
+        return ure.match(self.regex, path) is not None
+
+
+    def get_path_params(self, path):
+        &#34;&#34;&#34;
+        Accept current path from HTTP request and try found path parameters.
+        :param path: Incoming path from HTTP request.
+        :return: path parameters in dictionary
+        &#34;&#34;&#34;
+
+        params = None
+        if len(self.param_keys) &gt; 0:
+            log.debug(&#34;Getting path variables from path.&#34;)
+
+            params = {}
+            split_path = path.split(&#34;/&#34;)
+            slash_arr_size = len(self.num_slashes)
+
+            for i in range(0, slash_arr_size):
+                params[self.param_keys[i]] = split_path[self.num_slashes[i]]
+
         return params
 
-class Static_route(Route):
-    &#39;&#39;&#39;
+
+class StaticRoute(Route):
+    &#34;&#34;&#34;
     Static route is child of Route class. Define routes for device folder and server static files in device.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self, root, path, controller=None):
         self.file_path = path if controller is None else controller.path+path
+        self.root = root
+
         log.info(&#34;Creating static route.&#34;)
-        def find_file(req, res):
+
+        def _inner(req, res):
             if validate(controller, req, res):
-                try:
-                    log.info(&#34;Looking for static file.&#34;)
-                    destination_file = req.path.replace(self.file_path, root, 1)
-                    log.debug(&#34;Destination path should be: &#34;+destination_file)
-                    f = open(destination_file)
-                    f_data = f.read()
-                    suff = destination_file.split(&#39;.&#39;)[1]
-                    mime = get_mime_by_suffix(suff)
-                    res.status(Status.OK).type(mime).entity(f_data).build()
-                except:
-                    log.warning(&#34;File was not found!&#34;)
-                    res.status(Status.NOT_FOUND).type(Mime.HTML).entity(file_not_found(req.path)).build()
-        super().__init__(path, &#34;GET&#34;, find_file)
+                res.status(Status.OK).type(self.mime).entity(self.file).build()
+
+        super().__init__(path, [&#34;GET&#34;], _inner)
+
 
     def __compile_regex(self, url):
         try:
-            self.regex_str = &#34;^&#34;+self.file_path+&#34;\S+&#34;
+            self.regex_str = &#34;^{p}\S+&#34;.format(p=self.file_path)
             return ure.compile(self.regex_str), []
         except:
-            raise CompileRegexException(&#34;Error with compiling regex in static route class!&#34;)</code></pre>
+            raise CompileRegexException(&#34;Error with compiling regex in static route class!&#34;)
+
+
+    def is_match(self, path):
+        try:
+            destination_file = path.replace(self.file_path, self.root, 1)
+
+            log.info(&#34;Looking for static file.&#34;)
+            log.debug(&#34;File destination path should be {df}.&#34;.format(df=destination_file))
+
+            self.file = open(destination_file)
+            self.mime = get_mime_by_suffix(destination_file)
+            return True
+        except:
+            log.debug(&#34;Match with static route was not found.&#34;)
+            return False</code></pre>
 </details>
 </section>
 <section>
@@ -146,29 +173,36 @@ class Static_route(Route):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Route:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Route class. Contains path, HTTP methods and reference for route function.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
+
     def __init__(self, path, methods, fc):
-        log.info(&#34;Register route for methods: [&#34;+&#39;, &#39;.join(methods)+&#34;] and path:&#34;+path)
+        log.info(&#34;Register route for method/s: {m} and path: {p}.&#34;.format(m=methods, p=path))
+
+        self.path = path
         self.regex, self.param_keys = self.__compile_regex(path)
         self.methods = methods
         self.fc = fc
 
+
     def __compile_regex(self, url):
         try:
             log.debug(&#34;Compile url to regex.&#34;)
+
             self.num_slashes = []
             slash = 0
             params = []
             current_param = &#34;&#34;
             param_reading = False
             self.regex_str = &#34;^&#34;
+
             for char in url:
-                if char == &#34;{&#34;:
+                if char is &#34;{&#34;:
                     self.num_slashes.append(slash)
                     param_reading = True
-                elif char == &#34;}&#34;:
+                elif char is &#34;}&#34;:
                     param_reading = False
                     params.append(current_param)
                     self.regex_str += &#34;\w+&#34;
@@ -177,72 +211,107 @@ class Static_route(Route):
                     current_param += char
                 else:
                     self.regex_str += char
-                    slash = slash+1 if char == &#34;/&#34; else slash
+                    slash = slash+1 if char is &#34;/&#34; else slash
+
             self.regex_str += &#34;$&#34;
             return ure.compile(self.regex_str), params
         except:
             raise CompileRegexException(&#34;Error with compiling regex in route class!&#34;)
 
-    def match_with_vars(self, path):
-        &#39;&#39;&#39;
-        Accept current path from HTTP request and looking for match with current route.
-        If found try also found path parameters.
-        :param path: Incoming path from HTTP request.
-        :return: Boolean of match; path parameters in dictionary
-        &#39;&#39;&#39;
-        match = ure.match(self.regex, path) != None
-        params = None
-        if match:
-            if len(self.param_keys) &gt; 0:
-                params = self.__find_vars(path)
-        return match, params
 
-    def __find_vars(self, path):
-        log.debug(&#34;Getting variables from path.&#34;)
-        params = {}
-        split_path = path.split(&#34;/&#34;)
-        slash_arr_size = len(self.num_slashes)
-        for i in range(0, slash_arr_size):
-            params[self.param_keys[i]] = split_path[self.num_slashes[i]]
+    def is_match(self, path):
+        &#34;&#34;&#34;
+        Accept current path from HTTP request and looking for match with current route.
+        :param path: Incoming path from HTTP request.
+        :return: Boolean of match
+        &#34;&#34;&#34;
+        log.debug(&#34;Looking for route match.\n Path: {p}\n Regex: {r}&#34;.format(p=path, r=self.regex_str))
+        return ure.match(self.regex, path) is not None
+
+
+    def get_path_params(self, path):
+        &#34;&#34;&#34;
+        Accept current path from HTTP request and try found path parameters.
+        :param path: Incoming path from HTTP request.
+        :return: path parameters in dictionary
+        &#34;&#34;&#34;
+
+        params = None
+        if len(self.param_keys) &gt; 0:
+            log.debug(&#34;Getting path variables from path.&#34;)
+
+            params = {}
+            split_path = path.split(&#34;/&#34;)
+            slash_arr_size = len(self.num_slashes)
+
+            for i in range(0, slash_arr_size):
+                params[self.param_keys[i]] = split_path[self.num_slashes[i]]
+
         return params</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
-<li><a title="miniweb.entity.route.Static_route" href="#miniweb.entity.route.Static_route">Static_route</a></li>
+<li><a title="miniweb.entity.route.StaticRoute" href="#miniweb.entity.route.StaticRoute">StaticRoute</a></li>
 </ul>
 <h3>Methods</h3>
 <dl>
-<dt id="miniweb.entity.route.Route.match_with_vars"><code class="name flex">
-<span>def <span class="ident">match_with_vars</span></span>(<span>self, path)</span>
+<dt id="miniweb.entity.route.Route.get_path_params"><code class="name flex">
+<span>def <span class="ident">get_path_params</span></span>(<span>self, path)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Accept current path from HTTP request and looking for match with current route.
-If found try also found path parameters.
+<div class="desc"><p>Accept current path from HTTP request and try found path parameters.
 :param path: Incoming path from HTTP request.
-:return: Boolean of match; path parameters in dictionary</p></div>
+:return: path parameters in dictionary</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def match_with_vars(self, path):
-    &#39;&#39;&#39;
-    Accept current path from HTTP request and looking for match with current route.
-    If found try also found path parameters.
+<pre><code class="python">def get_path_params(self, path):
+    &#34;&#34;&#34;
+    Accept current path from HTTP request and try found path parameters.
     :param path: Incoming path from HTTP request.
-    :return: Boolean of match; path parameters in dictionary
-    &#39;&#39;&#39;
-    match = ure.match(self.regex, path) != None
+    :return: path parameters in dictionary
+    &#34;&#34;&#34;
+
     params = None
-    if match:
-        if len(self.param_keys) &gt; 0:
-            params = self.__find_vars(path)
-    return match, params</code></pre>
+    if len(self.param_keys) &gt; 0:
+        log.debug(&#34;Getting path variables from path.&#34;)
+
+        params = {}
+        split_path = path.split(&#34;/&#34;)
+        slash_arr_size = len(self.num_slashes)
+
+        for i in range(0, slash_arr_size):
+            params[self.param_keys[i]] = split_path[self.num_slashes[i]]
+
+    return params</code></pre>
+</details>
+</dd>
+<dt id="miniweb.entity.route.Route.is_match"><code class="name flex">
+<span>def <span class="ident">is_match</span></span>(<span>self, path)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Accept current path from HTTP request and looking for match with current route.
+:param path: Incoming path from HTTP request.
+:return: Boolean of match</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_match(self, path):
+    &#34;&#34;&#34;
+    Accept current path from HTTP request and looking for match with current route.
+    :param path: Incoming path from HTTP request.
+    :return: Boolean of match
+    &#34;&#34;&#34;
+    log.debug(&#34;Looking for route match.\n Path: {p}\n Regex: {r}&#34;.format(p=path, r=self.regex_str))
+    return ure.match(self.regex, path) is not None</code></pre>
 </details>
 </dd>
 </dl>
 </dd>
-<dt id="miniweb.entity.route.Static_route"><code class="flex name class">
-<span>class <span class="ident">Static_route</span></span>
+<dt id="miniweb.entity.route.StaticRoute"><code class="flex name class">
+<span>class <span class="ident">StaticRoute</span></span>
 <span>(</span><span>root, path, controller=None)</span>
 </code></dt>
 <dd>
@@ -251,36 +320,46 @@ If found try also found path parameters.
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class Static_route(Route):
-    &#39;&#39;&#39;
+<pre><code class="python">class StaticRoute(Route):
+    &#34;&#34;&#34;
     Static route is child of Route class. Define routes for device folder and server static files in device.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self, root, path, controller=None):
         self.file_path = path if controller is None else controller.path+path
+        self.root = root
+
         log.info(&#34;Creating static route.&#34;)
-        def find_file(req, res):
+
+        def _inner(req, res):
             if validate(controller, req, res):
-                try:
-                    log.info(&#34;Looking for static file.&#34;)
-                    destination_file = req.path.replace(self.file_path, root, 1)
-                    log.debug(&#34;Destination path should be: &#34;+destination_file)
-                    f = open(destination_file)
-                    f_data = f.read()
-                    suff = destination_file.split(&#39;.&#39;)[1]
-                    mime = get_mime_by_suffix(suff)
-                    res.status(Status.OK).type(mime).entity(f_data).build()
-                except:
-                    log.warning(&#34;File was not found!&#34;)
-                    res.status(Status.NOT_FOUND).type(Mime.HTML).entity(file_not_found(req.path)).build()
-        super().__init__(path, &#34;GET&#34;, find_file)
+                res.status(Status.OK).type(self.mime).entity(self.file).build()
+
+        super().__init__(path, [&#34;GET&#34;], _inner)
+
 
     def __compile_regex(self, url):
         try:
-            self.regex_str = &#34;^&#34;+self.file_path+&#34;\S+&#34;
+            self.regex_str = &#34;^{p}\S+&#34;.format(p=self.file_path)
             return ure.compile(self.regex_str), []
         except:
-            raise CompileRegexException(&#34;Error with compiling regex in static route class!&#34;)</code></pre>
+            raise CompileRegexException(&#34;Error with compiling regex in static route class!&#34;)
+
+
+    def is_match(self, path):
+        try:
+            destination_file = path.replace(self.file_path, self.root, 1)
+
+            log.info(&#34;Looking for static file.&#34;)
+            log.debug(&#34;File destination path should be {df}.&#34;.format(df=destination_file))
+
+            self.file = open(destination_file)
+            self.mime = get_mime_by_suffix(destination_file)
+            return True
+        except:
+            log.debug(&#34;Match with static route was not found.&#34;)
+            return False</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -290,7 +369,8 @@ If found try also found path parameters.
 <ul class="hlist">
 <li><code><b><a title="miniweb.entity.route.Route" href="#miniweb.entity.route.Route">Route</a></b></code>:
 <ul class="hlist">
-<li><code><a title="miniweb.entity.route.Route.match_with_vars" href="#miniweb.entity.route.Route.match_with_vars">match_with_vars</a></code></li>
+<li><code><a title="miniweb.entity.route.Route.get_path_params" href="#miniweb.entity.route.Route.get_path_params">get_path_params</a></code></li>
+<li><code><a title="miniweb.entity.route.Route.is_match" href="#miniweb.entity.route.Route.is_match">is_match</a></code></li>
 </ul>
 </li>
 </ul>
@@ -314,11 +394,12 @@ If found try also found path parameters.
 <li>
 <h4><code><a title="miniweb.entity.route.Route" href="#miniweb.entity.route.Route">Route</a></code></h4>
 <ul class="">
-<li><code><a title="miniweb.entity.route.Route.match_with_vars" href="#miniweb.entity.route.Route.match_with_vars">match_with_vars</a></code></li>
+<li><code><a title="miniweb.entity.route.Route.get_path_params" href="#miniweb.entity.route.Route.get_path_params">get_path_params</a></code></li>
+<li><code><a title="miniweb.entity.route.Route.is_match" href="#miniweb.entity.route.Route.is_match">is_match</a></code></li>
 </ul>
 </li>
 <li>
-<h4><code><a title="miniweb.entity.route.Static_route" href="#miniweb.entity.route.Static_route">Static_route</a></code></h4>
+<h4><code><a title="miniweb.entity.route.StaticRoute" href="#miniweb.entity.route.StaticRoute">StaticRoute</a></code></h4>
 </li>
 </ul>
 </li>

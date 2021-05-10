@@ -29,51 +29,60 @@
 <pre><code class="python">from miniweb.core.miniweb import log
 
 class Response:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Response class for building HTTP response.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self):
         self.can_send = False
         self.stat = 500
-        self.mime = &#34;&#34;
-        self.ent = &#34;&#34;
+        self.mime = None
+        self.ent = None
+
 
     def status(self, status):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Set HTTP status to Response.
         :param status: HTTP status code.
         :return: self
-        &#39;&#39;&#39;
-        log.debug(&#34;Response status was set to &#34;+str(status))
+        &#34;&#34;&#34;
+
+        log.debug(&#34;Response status was set to {s}.&#34;.format(s=status))
         self.stat = status
         return self
 
+
     def entity(self, data):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Set response data.
         :param data: Response data.
         :return: self
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         self.ent = data
         return self
 
+
     def type(self, mime):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Set MIME type to Response.
         :param mime: Response data type.
         :return: self
-        &#39;&#39;&#39;
-        log.debug(&#34;Response type was set to &#34;+mime)
+        &#34;&#34;&#34;
+
+        log.debug(&#34;Response type was set to {m}.&#34;.format(m=mime))
         self.mime = mime
         return self
 
+
     def build(self):
-        &#39;&#39;&#39;
-        Mark Response class as ready for send.
+        &#34;&#34;&#34;
+        Send response to client and mark it as finished.
         :return: self
-        &#39;&#39;&#39;
-        log.info(&#34;Building response with status:&#34;+str(self.stat)+&#34; and type:&#34;+self.mime)
+        &#34;&#34;&#34;
+
+        log.debug(&#34;Response was marked as builded.&#34;)
         self.can_send = True
         return self</code></pre>
 </details>
@@ -97,51 +106,60 @@ class Response:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class Response:
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Response class for building HTTP response.
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
 
     def __init__(self):
         self.can_send = False
         self.stat = 500
-        self.mime = &#34;&#34;
-        self.ent = &#34;&#34;
+        self.mime = None
+        self.ent = None
+
 
     def status(self, status):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Set HTTP status to Response.
         :param status: HTTP status code.
         :return: self
-        &#39;&#39;&#39;
-        log.debug(&#34;Response status was set to &#34;+str(status))
+        &#34;&#34;&#34;
+
+        log.debug(&#34;Response status was set to {s}.&#34;.format(s=status))
         self.stat = status
         return self
 
+
     def entity(self, data):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Set response data.
         :param data: Response data.
         :return: self
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
+
         self.ent = data
         return self
 
+
     def type(self, mime):
-        &#39;&#39;&#39;
+        &#34;&#34;&#34;
         Set MIME type to Response.
         :param mime: Response data type.
         :return: self
-        &#39;&#39;&#39;
-        log.debug(&#34;Response type was set to &#34;+mime)
+        &#34;&#34;&#34;
+
+        log.debug(&#34;Response type was set to {m}.&#34;.format(m=mime))
         self.mime = mime
         return self
 
+
     def build(self):
-        &#39;&#39;&#39;
-        Mark Response class as ready for send.
+        &#34;&#34;&#34;
+        Send response to client and mark it as finished.
         :return: self
-        &#39;&#39;&#39;
-        log.info(&#34;Building response with status:&#34;+str(self.stat)+&#34; and type:&#34;+self.mime)
+        &#34;&#34;&#34;
+
+        log.debug(&#34;Response was marked as builded.&#34;)
         self.can_send = True
         return self</code></pre>
 </details>
@@ -151,18 +169,19 @@ class Response:
 <span>def <span class="ident">build</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Mark Response class as ready for send.
+<div class="desc"><p>Send response to client and mark it as finished.
 :return: self</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def build(self):
-    &#39;&#39;&#39;
-    Mark Response class as ready for send.
+    &#34;&#34;&#34;
+    Send response to client and mark it as finished.
     :return: self
-    &#39;&#39;&#39;
-    log.info(&#34;Building response with status:&#34;+str(self.stat)+&#34; and type:&#34;+self.mime)
+    &#34;&#34;&#34;
+
+    log.debug(&#34;Response was marked as builded.&#34;)
     self.can_send = True
     return self</code></pre>
 </details>
@@ -179,11 +198,12 @@ class Response:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def entity(self, data):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Set response data.
     :param data: Response data.
     :return: self
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
+
     self.ent = data
     return self</code></pre>
 </details>
@@ -200,12 +220,13 @@ class Response:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def status(self, status):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Set HTTP status to Response.
     :param status: HTTP status code.
     :return: self
-    &#39;&#39;&#39;
-    log.debug(&#34;Response status was set to &#34;+str(status))
+    &#34;&#34;&#34;
+
+    log.debug(&#34;Response status was set to {s}.&#34;.format(s=status))
     self.stat = status
     return self</code></pre>
 </details>
@@ -222,12 +243,13 @@ class Response:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def type(self, mime):
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
     Set MIME type to Response.
     :param mime: Response data type.
     :return: self
-    &#39;&#39;&#39;
-    log.debug(&#34;Response type was set to &#34;+mime)
+    &#34;&#34;&#34;
+
+    log.debug(&#34;Response type was set to {m}.&#34;.format(m=mime))
     self.mime = mime
     return self</code></pre>
 </details>
