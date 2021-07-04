@@ -40,6 +40,9 @@ class Response:
         self.mime = None
         self.ent = None
 
+        self.to_stop = False
+        self.stop_time = 0
+
 
     def status(self, status):
         &#34;&#34;&#34;
@@ -73,6 +76,16 @@ class Response:
 
         log.debug(&#34;Response type was set to {m}.&#34;.format(m=mime))
         self.mime = mime
+        return self
+
+
+    def stop(self, ms=0):
+        &#34;&#34;&#34;
+        Set action for stop server after delay
+        :return: self
+        &#34;&#34;&#34;
+        self.to_stop = True
+        self.stop_time = int(ms)
         return self
 
 
@@ -117,6 +130,9 @@ class Response:
         self.mime = None
         self.ent = None
 
+        self.to_stop = False
+        self.stop_time = 0
+
 
     def status(self, status):
         &#34;&#34;&#34;
@@ -150,6 +166,16 @@ class Response:
 
         log.debug(&#34;Response type was set to {m}.&#34;.format(m=mime))
         self.mime = mime
+        return self
+
+
+    def stop(self, ms=0):
+        &#34;&#34;&#34;
+        Set action for stop server after delay
+        :return: self
+        &#34;&#34;&#34;
+        self.to_stop = True
+        self.stop_time = int(ms)
         return self
 
 
@@ -231,6 +257,26 @@ class Response:
     return self</code></pre>
 </details>
 </dd>
+<dt id="miniweb.message.response.Response.stop"><code class="name flex">
+<span>def <span class="ident">stop</span></span>(<span>self, ms=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set action for stop server after delay
+:return: self</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def stop(self, ms=0):
+    &#34;&#34;&#34;
+    Set action for stop server after delay
+    :return: self
+    &#34;&#34;&#34;
+    self.to_stop = True
+    self.stop_time = int(ms)
+    return self</code></pre>
+</details>
+</dd>
 <dt id="miniweb.message.response.Response.type"><code class="name flex">
 <span>def <span class="ident">type</span></span>(<span>self, mime)</span>
 </code></dt>
@@ -278,6 +324,7 @@ class Response:
 <li><code><a title="miniweb.message.response.Response.build" href="#miniweb.message.response.Response.build">build</a></code></li>
 <li><code><a title="miniweb.message.response.Response.entity" href="#miniweb.message.response.Response.entity">entity</a></code></li>
 <li><code><a title="miniweb.message.response.Response.status" href="#miniweb.message.response.Response.status">status</a></code></li>
+<li><code><a title="miniweb.message.response.Response.stop" href="#miniweb.message.response.Response.stop">stop</a></code></li>
 <li><code><a title="miniweb.message.response.Response.type" href="#miniweb.message.response.Response.type">type</a></code></li>
 </ul>
 </li>

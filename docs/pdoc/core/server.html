@@ -27,7 +27,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">#import uasyncio as asyncio
-import gc
+#import gc
 #import ujson
 
 from miniweb.message.request import Request
@@ -40,7 +40,7 @@ class Server:
     &#34;&#34;&#34;
     Singleton class. Run uasyncio and handle HTTP request/response and send it to miniweb.
     &#34;&#34;&#34;
-    __instance = None
+    __inst = None
 
 
     @staticmethod
@@ -51,14 +51,16 @@ class Server:
         :return: Server object instance.
         &#34;&#34;&#34;
 
-        if Server.__instance is None:
+        if Server.__inst is None:
             Server(miniweb)
+        return Server.__inst
 
 
     def __init__(self, miniweb):
-        if Server.__instance is not None:
+        if Server.__inst is not None:
             log.error(&#34;Cannot create new instance of Server class. Its Singleton!&#34;)
         else:
+            Server.__inst = self
             self.miniweb = miniweb
             self.config = miniweb.config
             self.__init()
@@ -75,9 +77,9 @@ class Server:
 
         log.info(&#34;Server is running on {h} with port: {p}.&#34;.format(h=self.config.host, p=self.config.port))
 
-        e_loop = asyncio.get_event_loop()
-        e_loop.create_task(server_task)
-        e_loop.run_forever()
+        self.e_loop = asyncio.get_event_loop()
+        self.e_loop.create_task(server_task)
+        self.e_loop.run_forever()
 
 
     async def __handle(self, reader, writer):
@@ -107,6 +109,9 @@ class Server:
             await self.__close_connection(writer)
         else:
             log.warning(&#34;End communication with client - will drop on timeout!&#34;)
+
+        if res.to_stop:
+            await self.__stop(res.stop_time)
 
 
     async def __send_headers(self, res, writer):
@@ -143,7 +148,14 @@ class Server:
 
     async def __close_connection(self, writer):
         log.debug(&#34;Closing communication with client.&#34;)
-        await writer.aclose()</code></pre>
+        await writer.aclose()
+
+
+    async def __stop(self, ms):
+        log.debug(&#34;Miniweb server will be stopped in {t}ms.&#34;.format(t=ms))
+        await asyncio.sleep_ms(ms)
+        self.e_loop.stop()
+        log.info(&#34;Miniweb has been stopped.&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -169,7 +181,7 @@ class Server:
     &#34;&#34;&#34;
     Singleton class. Run uasyncio and handle HTTP request/response and send it to miniweb.
     &#34;&#34;&#34;
-    __instance = None
+    __inst = None
 
 
     @staticmethod
@@ -180,14 +192,16 @@ class Server:
         :return: Server object instance.
         &#34;&#34;&#34;
 
-        if Server.__instance is None:
+        if Server.__inst is None:
             Server(miniweb)
+        return Server.__inst
 
 
     def __init__(self, miniweb):
-        if Server.__instance is not None:
+        if Server.__inst is not None:
             log.error(&#34;Cannot create new instance of Server class. Its Singleton!&#34;)
         else:
+            Server.__inst = self
             self.miniweb = miniweb
             self.config = miniweb.config
             self.__init()
@@ -204,9 +218,9 @@ class Server:
 
         log.info(&#34;Server is running on {h} with port: {p}.&#34;.format(h=self.config.host, p=self.config.port))
 
-        e_loop = asyncio.get_event_loop()
-        e_loop.create_task(server_task)
-        e_loop.run_forever()
+        self.e_loop = asyncio.get_event_loop()
+        self.e_loop.create_task(server_task)
+        self.e_loop.run_forever()
 
 
     async def __handle(self, reader, writer):
@@ -236,6 +250,9 @@ class Server:
             await self.__close_connection(writer)
         else:
             log.warning(&#34;End communication with client - will drop on timeout!&#34;)
+
+        if res.to_stop:
+            await self.__stop(res.stop_time)
 
 
     async def __send_headers(self, res, writer):
@@ -272,7 +289,14 @@ class Server:
 
     async def __close_connection(self, writer):
         log.debug(&#34;Closing communication with client.&#34;)
-        await writer.aclose()</code></pre>
+        await writer.aclose()
+
+
+    async def __stop(self, ms):
+        log.debug(&#34;Miniweb server will be stopped in {t}ms.&#34;.format(t=ms))
+        await asyncio.sleep_ms(ms)
+        self.e_loop.stop()
+        log.info(&#34;Miniweb has been stopped.&#34;)</code></pre>
 </details>
 <h3>Static methods</h3>
 <dl>
@@ -295,8 +319,9 @@ def get_instance(miniweb):
     :return: Server object instance.
     &#34;&#34;&#34;
 
-    if Server.__instance is None:
-        Server(miniweb)</code></pre>
+    if Server.__inst is None:
+        Server(miniweb)
+    return Server.__inst</code></pre>
 </details>
 </dd>
 </dl>
