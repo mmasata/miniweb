@@ -129,6 +129,8 @@ from miniweb import Status, Mime, app
        res.status(Status.OK).type("application/json").entity(dict).build()
 ``` 
 
+Přes Response lze také přistoupit k metodě stop(), která zastaví celý miniweb. Lze předat parametr s milisekundy, za jak dlouho zastavení nastane. Více v ukázce [stop_server_example.py](../examples/stop_server_example.py)
+
 ### Statické routery
 Statické routery slouží k spravování servírování statických souborů na serveru. Lze jich nadefinovat více. Přijímají dva povinné parametry - **root**, **path** a jeden nepovinný parametr- **controller**. Parametr **root** definuje, která složka na používaném zařízení je ta výchozí (například "/var/www"). Parametr **path** naopak definuje jakýsi alias, pod kterým bude daná root cesta zadávána v endpointu *(například máme root "/var/www/subfolder/" a path "/file/", tedy když zadáme "/file/index.html", pak se vrací soubor "/var/www/subfolder/index.html")*.
 ```python
