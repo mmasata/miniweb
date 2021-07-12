@@ -12,9 +12,6 @@ class Response:
         self.mime = None
         self.ent = None
 
-        self.to_stop = False
-        self.stop_time = 0
-
 
     def status(self, status):
         """
@@ -48,16 +45,6 @@ class Response:
 
         log.debug("Response type was set to {m}.".format(m=mime))
         self.mime = mime
-        return self
-
-
-    def stop(self, ms=0):
-        """
-        Set action for stop server after delay
-        :return: self
-        """
-        self.to_stop = True
-        self.stop_time = int(ms)
         return self
 
 

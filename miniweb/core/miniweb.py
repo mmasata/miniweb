@@ -67,7 +67,17 @@ class Miniweb:
         """
 
         log.debug("Miniweb send request to initialize Server.")
-        Server.get_instance(self)
+        Server.get_instance(self).init()
+
+
+    def stop(self, ms=0):
+        """
+        Set action for stop server after delay
+        :return: None
+        """
+        s = Server.get_instance(self)
+        s.keep_run = False
+        s.delay = int(ms)
 
 
     def static_router(self, root, path, controller=None):

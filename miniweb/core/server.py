@@ -35,10 +35,16 @@ class Server:
             Server.__inst = self
             self.miniweb = miniweb
             self.config = miniweb.config
-            self.__init()
 
 
-    def __init(self):
+    def init(self):
+        """
+        Method for server in asyncio event loop.
+        :return: None
+        """
+        self.keep_run = True
+        self.delay = 0
+
         gc.collect()
         server_task = None
 
@@ -82,8 +88,8 @@ class Server:
         else:
             log.warning("End communication with client - will drop on timeout!")
 
-        if res.to_stop:
-            await self.__stop(res.stop_time)
+        if not self.keep_run:
+            await self.__stop()
 
 
     async def __send_headers(self, res, writer):
@@ -123,8 +129,8 @@ class Server:
         await writer.aclose()
 
 
-    async def __stop(self, ms):
-        log.debug("Miniweb server will be stopped in {t}ms.".format(t=ms))
-        await asyncio.sleep_ms(ms)
+    async def __stop(self):
+        log.debug("Miniweb server will be stopped in {t}ms.".format(t=self.delay))
+        await asyncio.sleep_ms(self.delay)
         self.e_loop.stop()
         log.info("Miniweb has been stopped.")
