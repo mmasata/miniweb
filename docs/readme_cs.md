@@ -29,6 +29,29 @@ Miniweb je jednoduchý web aplikační framework určený pro mikročipy (primá
 
 ## API
 
+### Inicializace
+
+Inicializace je provedena prvotním naimportováním miniwebu a poté uložení instance Miniwebu do proměnné.
+To probíhá skrze funkci app(), která zajišťuje vrácení právě jedné instance (Singleton).
+
+```python
+import miniweb
+
+
+app = miniweb.app()
+```
+
+
+### Run a Stop
+
+Spuštění serveru a jeho vypnutí je umožněno skrze stejnojmenné metody run() a stop().
+Spuštění musí být provoláno až po vydefinování všech Route/Controllerů/Filterů.
+
+Ukončení serveru má nepovinný parametr - delay. Pokud není vyplněn, pak je Server ukončen okamžitě,
+v opačném případě se ukončí až po uvedeném čase (v milisekundách).
+
+*Více v ukázce: [stop_server_example.py](../examples/stop_server_example.py)*
+
 ### Route
 
 Definuje se skrze dekorátor. Obsahuje 4 univerzální funkce a jednu obecnou - *get()*, *post()*, *put()*, *delete()* a *route()*. U obecné je nutné nadefinovat HTTP metodu (či více HTTP metod).
@@ -129,7 +152,6 @@ from miniweb import Status, Mime, app
        res.status(Status.OK).type("application/json").entity(dict).build()
 ``` 
 
-Přes Response lze také přistoupit k metodě stop(), která zastaví celý miniweb. Lze předat parametr s milisekundy, za jak dlouho zastavení nastane. Více v ukázce [stop_server_example.py](../examples/stop_server_example.py)
 
 ### Statické routery
 Statické routery slouží k spravování servírování statických souborů na serveru. Lze jich nadefinovat více. Přijímají dva povinné parametry - **root**, **path** a jeden nepovinný parametr- **controller**. Parametr **root** definuje, která složka na používaném zařízení je ta výchozí (například "/var/www"). Parametr **path** naopak definuje jakýsi alias, pod kterým bude daná root cesta zadávána v endpointu *(například máme root "/var/www/subfolder/" a path "/file/", tedy když zadáme "/file/index.html", pak se vrací soubor "/var/www/subfolder/index.html")*.

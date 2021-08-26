@@ -95,7 +95,17 @@ class Miniweb:
         &#34;&#34;&#34;
 
         log.debug(&#34;Miniweb send request to initialize Server.&#34;)
-        Server.get_instance(self)
+        Server.get_instance(self).init()
+
+
+    def stop(self, ms=0):
+        """
+        Set action for stop server after delay
+        :return: None
+        """
+        s = Server.get_instance(self)
+        s.keep_run = False
+        s.delay = int(ms)
 
 
     def static_router(self, root, path, controller=None):
@@ -326,7 +336,17 @@ class Miniweb:
         &#34;&#34;&#34;
 
         log.debug(&#34;Miniweb send request to initialize Server.&#34;)
-        Server.get_instance(self)
+        Server.get_instance(self).init()
+
+
+    def stop(self, ms=0):
+        """
+        Set action for stop server after delay
+        :return: None
+        """
+        s = Server.get_instance(self)
+        s.keep_run = False
+        s.delay = int(ms)
 
 
     def static_router(self, root, path, controller=None):
@@ -706,6 +726,27 @@ Register route to miniweb. General class method.
     Server.get_instance(self)</code></pre>
 </details>
 </dd>
+<dt id="miniweb.core.miniweb.Miniweb.stop"><code class="name flex">
+<span>def <span class="ident">stop</span></span>(<span>self, ms=0)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set action for stop server after delay
+:return: None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def stop(self, ms=0):
+    &#34;&#34;&#34;
+    Set action for stop server after delay
+    :return: None
+    &#34;&#34;&#34;
+
+    s = Server.get_instance(self)
+    s.keep_run = False
+    s.delay = int(ms)</code></pre>
+</details>
+</dd>
 <dt id="miniweb.core.miniweb.Miniweb.static_router"><code class="name flex">
 <span>def <span class="ident">static_router</span></span>(<span>self, root, path, controller=None)</span>
 </code></dt>
@@ -766,6 +807,7 @@ Register route to miniweb. General class method.
 <li><code><a title="miniweb.core.miniweb.Miniweb.put" href="#miniweb.core.miniweb.Miniweb.put">put</a></code></li>
 <li><code><a title="miniweb.core.miniweb.Miniweb.route" href="#miniweb.core.miniweb.Miniweb.route">route</a></code></li>
 <li><code><a title="miniweb.core.miniweb.Miniweb.run" href="#miniweb.core.miniweb.Miniweb.run">run</a></code></li>
+<li><code><a title="miniweb.core.miniweb.Miniweb.stop" href="#miniweb.core.miniweb.Miniweb.stop">stop</a></code></li>
 <li><code><a title="miniweb.core.miniweb.Miniweb.static_router" href="#miniweb.core.miniweb.Miniweb.static_router">static_router</a></code></li>
 </ul>
 </li>

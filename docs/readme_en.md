@@ -27,6 +27,30 @@ Miniweb is a simple web application framework designed for microchips (primary E
 
 ## API
 
+### Inicialization
+
+Initialization is performed by first importing the miniweb and then storing the Miniweb instance in a variable.
+This is done through the app() function, which returns just one instance (Singleton).
+
+```python
+import miniweb
+
+
+app = miniweb.app()
+```
+
+
+### Run and Stop
+
+Starting the server and shutting it down is possible through the run() and stop() methods of the same name.
+The start must be called only after all Route/Controllers/Filters have been defined.
+
+The server shutdown has an optional parameter - delay. If it is not filled in, then the Server is terminated immediately,
+otherwise it will not end until the specified time (in milliseconds).
+
+*More in example [stop_server_example.py](../examples/stop_server_example.py)*
+
+
 ### Route
 
 It is defined through the decorator. It contains 4 universal functions and one general - *get()*, *post()*, *put()*, *delete()* and *route()*. For general, it is necessary to define an HTTP method (or more HTTP methods).
@@ -124,8 +148,6 @@ from miniweb import Status, Mime
        }
        res.status(Status.OK).type("application/json").entity(dict).build()
 ``` 
-
-You can also access the stop() method via Response object, which stops the entire miniweb. You can pass a parameter with milliseconds for set stop delay. More in the example [stop_server_example.py](../examples/stop_server_example.py)
 
 ### Static routers
 Static routers are used to manage the serving of static files on the server. More can be defined. They accept two mandatory parameters - **root**, **path** and one optional parameter- **controller**. The **root** parameter defines which folder on the device you are using is the default (for example, "/var/www"). The parameter **path**, on the other hand, defines a kind of alias under which the given root path will be entered in the endpoint *(for example we have root "/var/www/subfolder/" and path "/file/", when we enter "/file/index.html", then the file "/var/www/subfolder/index.html")* is returned.
