@@ -2,6 +2,8 @@
 * [Základní informace](#základní-informace)
 * [Používané knihovny třetích stran](#používané-knihovny-třetích-stran)
 * [API](#api)
+    * [Inicializace](#inicializace)
+    * [Run a Stop](#run-a-stop)
     * [Route](#route)
         * [Request](#request)
         * [Response](#response)

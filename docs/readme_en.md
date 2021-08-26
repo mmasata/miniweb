@@ -2,6 +2,8 @@
 * [Basic information](#basic-information)
 * [Third party used libraries](#third-party-used-libraries)
 * [API](#api)
+    * [Inicialization](#inicialization)
+    * [Run and Stop](#run-and-stop)
     * [Route](#route)
         * [Request](#request)
         * [Response](#response)
